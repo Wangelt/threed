@@ -1,26 +1,72 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-white: #ffffff;
+  --color-background: #f9f9f9;
+  --color-black: #000000;
+  --color-text-primary: #1a1a1a;
+  --color-text-secondary: #8e8e93;
+  --color-text-muted: #b0b0b5;
+  --color-border: #e8e8ed;
+  --color-border-focus: #1a1a1a;
+  --color-surface: #f2f2f7;
+  --color-card: #f5f5f7;
+  --color-splash: #0a0a0a;
+  --color-grey-dark: #3a3a3c;
+  --color-grey-mid: #636366;
+  --color-grey-light: #d1d1d6;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-white: var(--color-white);
+  --color-background: var(--color-background);
+  --color-black: var(--color-black);
+  --color-text-primary: var(--color-text-primary);
+  --color-text-secondary: var(--color-text-secondary);
+  --color-text-muted: var(--color-text-muted);
+  --color-border: var(--color-border);
+  --color-border-focus: var(--color-border-focus);
+  --color-surface: var(--color-surface);
+  --color-card: var(--color-card);
+  --color-splash: var(--color-splash);
+  --color-grey-dark: var(--color-grey-dark);
+  --color-grey-mid: var(--color-grey-mid);
+  --color-grey-light: var(--color-grey-light);
+  --font-sans: var(--font-inter);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-white);
+  color: var(--color-text-primary);
+  font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Smooth scrolling — mirrors Flutter BouncingScrollPhysics feel on web */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Desktop: subtle page background behind centered app shell */
+@media (min-width: 1024px) {
+  body {
+    background: var(--color-background);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 480ms cubic-bezier(0.33, 1, 0.68, 1) both;
 }
