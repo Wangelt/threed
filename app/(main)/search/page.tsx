@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Search, X, ChevronRight, TrendingUp } from "lucide-react";
 import { MockProducts } from "@/lib/data/mock-products";
 import { SafeImage } from "@/components/ui/SafeImage";
+import { fadeUp, scaleIn, stagger, viewport } from "@/lib/motion";
 
 export default function SearchPage() {
   const router = useRouter();
@@ -18,8 +20,13 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="mx-auto flex h-full max-w-lg flex-col lg:max-w-5xl">
-      <div className="p-4">
+    <div className="flex h-full w-full flex-col px-4 sm:px-6 lg:px-8">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="py-4"
+      >
         <div
           className={`flex h-12 items-center gap-2.5 rounded-xl bg-surface px-3.5 transition-all duration-250 ${
             focused ? "border-[1.4px] border-black" : "border border-transparent"
@@ -42,29 +49,59 @@ export default function SearchPage() {
             </button>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {!focused ? (
         <>
-          <h2 className="px-4 pb-3 pt-2 text-base font-semibold">Categories</h2>
-          <div className="grid grid-cols-3 gap-3 px-4 sm:grid-cols-4 md:grid-cols-6">
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewport}
+            variants={fadeUp}
+            className="pb-3 pt-2 text-base font-semibold"
+          >
+            Categories
+          </motion.h2>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewport}
+            variants={stagger}
+            className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8"
+          >
             {MockProducts.categories.map(({ name, icon: Icon }) => (
-              <div
+              <motion.div
                 key={name}
+                variants={scaleIn}
                 className="flex aspect-[1.1] flex-col items-center justify-center rounded-[14px] bg-surface"
               >
                 <Icon size={28} className="text-text-primary" />
                 <span className="mt-1.5 text-xs font-medium">{name}</span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
-          <h2 className="mt-6 px-4 text-base font-semibold">Trending Now</h2>
-          <div className="mt-3 flex-1 overflow-y-auto px-4 pb-4">
+          <motion.h2
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewport}
+            variants={fadeUp}
+            className="mt-6 text-base font-semibold"
+          >
+            Trending Now
+          </motion.h2>
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={viewport}
+            variants={stagger}
+            className="mt-3 flex-1 overflow-y-auto pb-4"
+          >
             {MockProducts.items.map((product) => (
-              <button
+              <motion.button
                 key={product.id}
                 type="button"
+                variants={fadeUp}
                 onClick={() => search(product.name)}
                 className="flex w-full items-center gap-3 py-3 text-left"
               >
@@ -76,40 +113,66 @@ export default function SearchPage() {
                   <p className="text-[13px] font-semibold">{product.price}</p>
                 </div>
                 <ChevronRight size={18} className="shrink-0 text-text-muted" />
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
         </>
       ) : (
         <>
-          <h2 className="px-4 pb-3 pt-2 text-sm font-semibold">Recent Searches</h2>
-          <div className="flex flex-wrap gap-2 px-4">
+          <motion.h2
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="pb-3 pt-2 text-sm font-semibold"
+          >
+            Recent Searches
+          </motion.h2>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+            className="flex flex-wrap gap-2"
+          >
             {MockProducts.recentSearches.map((term) => (
-              <button
+              <motion.button
                 key={term}
                 type="button"
+                variants={fadeUp}
                 onClick={() => search(term)}
                 className="rounded-full bg-surface px-3.5 py-2 text-[13px]"
               >
                 {term}
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
 
-          <h2 className="mt-6 px-4 text-sm font-semibold">Trending Search</h2>
-          <div className="mt-2 flex-1 overflow-y-auto px-4 pb-4">
+          <motion.h2
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="mt-6 text-sm font-semibold"
+          >
+            Trending Search
+          </motion.h2>
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+            className="mt-2 grid flex-1 grid-cols-1 gap-x-8 overflow-y-auto pb-4 md:grid-cols-2 lg:grid-cols-3"
+          >
             {MockProducts.trendingSearches.map((term) => (
-              <button
+              <motion.button
                 key={term}
                 type="button"
+                variants={fadeUp}
                 onClick={() => search(term)}
                 className="flex w-full items-center gap-3 py-3 text-left"
               >
                 <TrendingUp size={20} className="text-text-secondary" />
                 <span className="text-sm">{term}</span>
-              </button>
+              </motion.button>
             ))}
-          </div>
+          </motion.div>
         </>
       )}
     </div>

@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { ArrowLeft, Circle, CircleDot } from "lucide-react";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { fadeUp, stagger } from "@/lib/motion";
 
 interface ReasonSelectViewProps {
   title: string;
@@ -34,22 +36,37 @@ export function ReasonSelectView({
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
-      <header className="flex items-center gap-2 border-b border-border px-2 py-3">
+      <motion.header
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="flex items-center gap-2 border-b border-border px-2 py-3"
+      >
         <button type="button" onClick={() => router.back()} className="p-2">
           <ArrowLeft size={22} />
         </button>
         <h1 className="flex-1 text-center text-[17px] font-semibold pr-10">{title}</h1>
-      </header>
+      </motion.header>
 
-      <div className="flex-1 overflow-y-auto p-4">
-        {subtitle && <p className="mb-3 text-[13px] text-text-secondary">{subtitle}</p>}
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={stagger}
+        className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 lg:px-8"
+      >
+        {subtitle && (
+          <motion.p variants={fadeUp} className="mb-3 text-[13px] text-text-secondary">
+            {subtitle}
+          </motion.p>
+        )}
         <div className="space-y-2.5">
           {reasons.map((reason, i) => {
             const isSelected = selected === i;
             return (
-              <button
+              <motion.button
                 key={reason}
                 type="button"
+                variants={fadeUp}
                 onClick={() => setSelected(i)}
                 className={`flex w-full items-center gap-3 rounded-xl border p-3.5 text-left transition-colors duration-200 ${
                   isSelected
@@ -63,13 +80,18 @@ export function ReasonSelectView({
                   <Circle size={20} className="shrink-0 text-black" />
                 )}
                 <span className="text-sm">{reason}</span>
-              </button>
+              </motion.button>
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
-      <div className="flex gap-3 border-t border-border p-4">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="flex gap-3 border-t border-border p-4"
+      >
         <button
           type="button"
           onClick={() => router.back()}
@@ -80,7 +102,7 @@ export function ReasonSelectView({
         <div className="flex-1">
           <PrimaryButton label="Next" onClick={handleNext} />
         </div>
-      </div>
+      </motion.div>
 
       {toast && (
         <div className="fixed bottom-24 left-1/2 z-50 -translate-x-1/2 rounded-lg bg-black px-4 py-3 text-sm text-white shadow-lg">

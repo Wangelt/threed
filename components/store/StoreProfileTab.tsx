@@ -1,17 +1,24 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Star } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { MockStore } from "@/lib/data/mock-store";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { RatingDistribution } from "@/components/order/RatingDistribution";
+import { fadeUp, stagger, viewport } from "@/lib/motion";
 
 export function StoreProfileTab() {
   const router = useRouter();
 
   return (
-    <div className="space-y-6 p-4 pb-6">
-      <div className="flex items-center gap-3">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={stagger}
+      className="space-y-6 px-4 py-4 pb-6 sm:px-6 lg:px-8"
+    >
+      <motion.div variants={fadeUp} className="flex items-center gap-3">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-black">
           <span className="font-bold text-white">3D</span>
         </div>
@@ -25,24 +32,37 @@ export function StoreProfileTab() {
         >
           Follow
         </button>
-      </div>
+      </motion.div>
 
-      <RatingDistribution percentages={MockStore.starDistribution} rating={MockStore.rating} />
-      <p className="text-xs text-text-secondary">{MockStore.totalReviews} reviews</p>
+      <motion.div variants={fadeUp}>
+        <RatingDistribution percentages={MockStore.starDistribution} rating={MockStore.rating} />
+        <p className="mt-2 text-xs text-text-secondary">{MockStore.totalReviews} reviews</p>
+      </motion.div>
 
-      <div>
+      <motion.div variants={fadeUp}>
         <h2 className="text-base font-bold">About the store</h2>
         <p className="mt-2 text-[13px] leading-[1.55] text-text-secondary">
           We craft premium 3D printed products with precision and care. From custom models to
           everyday accessories — quality you can feel.
         </p>
-      </div>
+      </motion.div>
 
-      <div>
-        <h2 className="text-base font-bold">Customer Reviews</h2>
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewport}
+        variants={stagger}
+      >
+        <motion.h2 variants={fadeUp} className="text-base font-bold">
+          Customer Reviews
+        </motion.h2>
         <div className="mt-3 space-y-3">
           {MockStore.reviews.map((review) => (
-            <div key={review.author} className="rounded-[14px] border border-border p-3.5">
+            <motion.div
+              key={review.author}
+              variants={fadeUp}
+              className="rounded-[14px] border border-border p-3.5"
+            >
               <div className="flex items-center justify-between">
                 <span className="text-[13px] font-semibold">{review.author}</span>
                 <span className="text-[11px] text-text-muted">{review.date}</span>
@@ -57,19 +77,22 @@ export function StoreProfileTab() {
                 ))}
               </div>
               <p className="mt-2 text-[13px] leading-[1.5] text-text-secondary">{review.text}</p>
-            </div>
+            </motion.div>
           ))}
         </div>
-      </div>
+      </motion.div>
 
-      <PrimaryButton label="Message Us" onClick={() => {}} />
-      <button
+      <motion.div variants={fadeUp}>
+        <PrimaryButton label="Message Us" onClick={() => {}} />
+      </motion.div>
+      <motion.button
         type="button"
+        variants={fadeUp}
         onClick={() => router.push("/orders")}
         className="w-full rounded-xl border border-border py-3.5 font-semibold text-black"
       >
         My Orders
-      </button>
-    </div>
+      </motion.button>
+    </motion.div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import {
   MockOrders,
@@ -10,6 +11,7 @@ import {
 import type { OrderModel } from "@/lib/data/mock-orders";
 import { FilterChipRow } from "@/components/order/FilterChipRow";
 import { OrderCard } from "@/components/order/OrderCard";
+import { fadeUp, stagger } from "@/lib/motion";
 
 const FILTERS = ["All", "Paid", "Shipped", "Delivered", "Returned"];
 
@@ -52,16 +54,26 @@ function OrdersContent() {
 
   return (
     <div className="min-h-screen bg-white">
-      <header className="flex items-center gap-2 border-b border-border px-2 py-3">
+      <motion.header
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="flex items-center gap-2 border-b border-border px-2 py-3 sm:px-4 lg:px-6"
+      >
         <button type="button" onClick={() => router.back()} className="p-2">
           <ArrowLeft size={22} />
         </button>
         <h1 className="flex-1 text-center text-[17px] font-semibold pr-10">
           {filter === 0 ? "Orders" : `Orders ${FILTERS[filter]}`}
         </h1>
-      </header>
+      </motion.header>
 
-      <div className="mt-2">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mt-2 px-2 sm:px-4 lg:px-6"
+      >
         <FilterChipRow
           labels={FILTERS}
           selected={filter}
@@ -70,29 +82,43 @@ function OrdersContent() {
             router.replace(`/orders?filter=${i}`, { scroll: false });
           }}
         />
-      </div>
+      </motion.div>
 
-      <div className="p-4">
+      <div className="px-4 py-4 sm:px-6 lg:px-8">
         {orders.length === 0 ? (
-          <p className="py-12 text-center text-text-secondary">No orders found</p>
+          <motion.p
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="py-12 text-center text-text-secondary"
+          >
+            No orders found
+          </motion.p>
         ) : (
-          <div className="space-y-3">
+          <motion.div
+            key={filter}
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+            className="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
+          >
             {orders.map((order) => (
-              <OrderCard
-                key={order.id}
-                order={order}
-                secondaryLabel={secondaryLabel(order)}
-                onDetails={() => router.push(orderPath(order.id))}
-                onSecondary={() => {
-                  if (order.status === OrderStatus.Shipped) {
-                    router.push(`${orderPath(order.id)}/track`);
-                  } else if (order.status === OrderStatus.Delivered) {
-                    router.push(`${orderPath(order.id)}?rate=true`);
-                  }
-                }}
-              />
+              <motion.div key={order.id} variants={fadeUp}>
+                <OrderCard
+                  order={order}
+                  secondaryLabel={secondaryLabel(order)}
+                  onDetails={() => router.push(orderPath(order.id))}
+                  onSecondary={() => {
+                    if (order.status === OrderStatus.Shipped) {
+                      router.push(`${orderPath(order.id)}/track`);
+                    } else if (order.status === OrderStatus.Delivered) {
+                      router.push(`${orderPath(order.id)}?rate=true`);
+                    }
+                  }}
+                />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </div>

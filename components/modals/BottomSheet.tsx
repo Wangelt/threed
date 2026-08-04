@@ -38,7 +38,7 @@ export function BottomSheet({ open, onClose, children, maxHeight = "85vh" }: Bot
             animate={{ y: 0 }}
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-lg flex-col rounded-t-[20px] bg-white lg:max-w-xl"
+            className="fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-2xl flex-col rounded-t-[20px] bg-white"
             style={{ maxHeight }}
           >
             {children}

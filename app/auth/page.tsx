@@ -2,10 +2,12 @@
 
 import { Suspense, useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { AuthTabBar } from "@/components/ui/AuthTabBar";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { SignupForm } from "@/components/auth/SignupForm";
+import { fadeUp, heroStagger } from "@/lib/motion";
 
 function AuthContent() {
   const router = useRouter();
@@ -22,17 +24,21 @@ function AuthContent() {
   );
 
   return (
-    <div className="min-h-screen bg-white flex flex-col max-w-lg mx-auto w-full">
-      <div className="h-3" />
-      <div className="flex justify-center">
-        <AppLogo />
-      </div>
-      <div className="h-4" />
-      <div className="px-6">
-        <AuthTabBar selectedIndex={tab} onChange={handleTabChange} />
-      </div>
+    <div className="flex min-h-screen w-full flex-col bg-white">
+      <div className="mx-auto w-full max-w-md px-6">
+      <motion.div initial="hidden" animate="visible" variants={heroStagger}>
+        <div className="h-3" />
+        <motion.div variants={fadeUp} className="flex justify-center">
+          <AppLogo />
+        </motion.div>
+        <div className="h-4" />
+        <motion.div variants={fadeUp}>
+          <AuthTabBar selectedIndex={tab} onChange={handleTabChange} />
+        </motion.div>
+      </motion.div>
       <div className="flex-1 overflow-y-auto">
         {tab === 0 ? <LoginForm embedded /> : <SignupForm embedded />}
+      </div>
       </div>
     </div>
   );

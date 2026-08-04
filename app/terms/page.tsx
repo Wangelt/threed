@@ -1,10 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { useAppDispatch } from "@/store/hooks";
 import { setTermsAgreed } from "@/store/slices/authSlice";
+import { fadeUp, stagger } from "@/lib/motion";
 
 export default function TermsPage() {
   const router = useRouter();
@@ -16,17 +18,33 @@ export default function TermsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col max-w-lg mx-auto w-full">
-      <header className="flex items-center gap-2 px-2 py-3 border-b border-border">
+    <div className="flex min-h-screen w-full flex-col bg-white">
+      <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col">
+      <motion.header
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="flex items-center gap-2 px-2 py-3 border-b border-border"
+      >
         <button type="button" onClick={() => router.back()} className="p-2">
           <ArrowLeft size={22} className="text-black" />
         </button>
         <h1 className="text-[17px] font-semibold flex-1 text-center pr-10">Terms of Use</h1>
-      </header>
+      </motion.header>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6">
-        <h2 className="text-xl font-bold">Welcome to 3D Game</h2>
-        <p className="mt-4 text-sm leading-[1.6] text-text-secondary whitespace-pre-line">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={stagger}
+        className="flex-1 overflow-y-auto px-6 py-6"
+      >
+        <motion.h2 variants={fadeUp} className="text-xl font-bold">
+          Welcome to 3D Game
+        </motion.h2>
+        <motion.p
+          variants={fadeUp}
+          className="mt-4 text-sm leading-[1.6] text-text-secondary whitespace-pre-line"
+        >
           {`By using our application, you agree to comply with and be bound by the following terms and conditions. Please review them carefully before using our services.
 
 1. Acceptance of Terms
@@ -46,11 +64,17 @@ Your privacy is important to us. Please review our Privacy Policy to understand 
 
 6. Limitation of Liability
 3D Game shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service.`}
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
 
-      <div className="p-6 border-t border-border">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="p-6 border-t border-border"
+      >
         <PrimaryButton label="Agree" onClick={handleAgree} />
+      </motion.div>
       </div>
     </div>
   );

@@ -37,7 +37,7 @@ function OrderSummaryContent({ order }: OrderSummaryViewProps) {
         <h1 className="flex-1 text-center text-[17px] font-semibold pr-10">Orders Summary</h1>
       </header>
 
-      <div className="space-y-4 p-4">
+      <div className="space-y-4 px-4 py-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold">{order.id}</span>
           <StatusPill label={orderStatusLabel(order.status)} />

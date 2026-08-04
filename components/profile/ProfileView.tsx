@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import {
   Store,
   Receipt,
@@ -10,23 +11,42 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
+import { fadeUp, heroStagger, stagger } from "@/lib/motion";
 
 export function ProfileView() {
   const router = useRouter();
 
   return (
-    <div className="mx-auto w-full max-w-lg px-6 py-6 lg:max-w-5xl">
+    <div className="w-full px-4 py-6 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-2xl">
       <div className="h-3" />
 
-      <div className="flex flex-col items-center">
-        <div className="flex h-20 w-20 items-center justify-center rounded-full bg-black">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={heroStagger}
+        className="flex flex-col items-center"
+      >
+        <motion.div
+          variants={fadeUp}
+          className="flex h-20 w-20 items-center justify-center rounded-full bg-black"
+        >
           <span className="text-[28px] font-bold text-white">W</span>
-        </div>
-        <h1 className="mt-3 text-xl font-bold">Wangel</h1>
-        <p className="text-[13px] text-text-secondary">wangel@3dgame.com</p>
-      </div>
+        </motion.div>
+        <motion.h1 variants={fadeUp} className="mt-3 text-xl font-bold">
+          Wangel
+        </motion.h1>
+        <motion.p variants={fadeUp} className="text-[13px] text-text-secondary">
+          wangel@3dgame.com
+        </motion.p>
+      </motion.div>
 
-      <div className="mt-8 space-y-2.5">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={stagger}
+        className="mt-8 space-y-2.5"
+      >
         <ProfileTile
           icon={Store}
           title="Store"
@@ -51,10 +71,16 @@ export function ProfileView() {
           subtitle="Account & preferences"
           onClick={() => {}}
         />
-      </div>
+      </motion.div>
 
-      <div className="mt-6">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mt-6"
+      >
         <PrimaryButton label="Sign Out" onClick={() => {}} />
+      </motion.div>
       </div>
     </div>
   );
@@ -72,8 +98,9 @@ function ProfileTile({
   onClick: () => void;
 }) {
   return (
-    <button
+    <motion.button
       type="button"
+      variants={fadeUp}
       onClick={onClick}
       className="flex w-full items-center gap-3.5 rounded-[14px] border border-border p-4 text-left transition-colors hover:bg-surface/50"
     >
@@ -85,6 +112,6 @@ function ProfileTile({
         <p className="mt-0.5 text-xs text-text-secondary">{subtitle}</p>
       </div>
       <ChevronRight size={20} className="shrink-0 text-text-muted" />
-    </button>
+    </motion.button>
   );
 }

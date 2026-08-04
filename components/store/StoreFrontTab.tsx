@@ -7,6 +7,7 @@ import { MockProducts } from "@/lib/data/mock-products";
 import { MockStore } from "@/lib/data/mock-store";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { ProductGrid } from "@/components/product/ProductGrid";
+import { fadeUp, scaleIn, stagger } from "@/lib/motion";
 
 export function StoreFrontTab() {
   const router = useRouter();
@@ -14,11 +15,14 @@ export function StoreFrontTab() {
   const popular = MockStore.popularProductIds.map((id) => MockProducts.byId(id));
 
   return (
-    <div className="space-y-5 p-4 pb-6">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={stagger}
+      className="space-y-5 px-4 py-4 pb-6 sm:px-6 lg:px-8"
+    >
       <motion.div
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        variants={scaleIn}
         className="relative h-[180px] overflow-hidden rounded-2xl"
       >
         <SafeImage src={MockProducts.bannerImage} alt="Featured collection" fill className="object-cover brightness-[0.6]" />
@@ -30,9 +34,7 @@ export function StoreFrontTab() {
 
       <motion.button
         type="button"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4, delay: 0.08 }}
+        variants={fadeUp}
         onClick={() => router.push(`/product/${featured.id}`)}
         className="flex w-full items-center gap-3 rounded-[14px] border border-border/60 bg-white p-3 shadow-[0_6px_16px_rgba(0,0,0,0.08)]"
       >
@@ -49,15 +51,15 @@ export function StoreFrontTab() {
         </div>
       </motion.button>
 
-      <div className="flex items-center justify-between">
+      <motion.div variants={fadeUp} className="flex items-center justify-between">
         <h2 className="text-base font-bold">Popular product</h2>
         <span className="text-[13px] text-text-secondary">{popular.length} items</span>
-      </div>
+      </motion.div>
 
       <ProductGrid
         products={popular}
         onProductTap={(p) => router.push(`/product/${p.id}`)}
       />
-    </div>
+    </motion.div>
   );
 }

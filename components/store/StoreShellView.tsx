@@ -2,10 +2,12 @@
 
 import { Suspense, useCallback, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { ArrowLeft, MoreVertical, Search } from "lucide-react";
 import { StoreFrontTab } from "./StoreFrontTab";
 import { StoreProductsTab } from "./StoreProductsTab";
 import { StoreProfileTab } from "./StoreProfileTab";
+import { fadeUp } from "@/lib/motion";
 
 const TABS = [
   { id: "front", label: "Store Front" },
@@ -32,8 +34,13 @@ function StoreShellContent() {
   );
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-lg flex-col bg-white lg:max-w-5xl">
-      <header className="flex items-center gap-1 px-2 pt-1">
+    <div className="flex min-h-screen w-full flex-col bg-white">
+      <motion.header
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="flex items-center gap-1 px-2 pt-1 sm:px-4 lg:px-6"
+      >
         <button type="button" onClick={() => router.back()} className="p-2">
           <ArrowLeft size={22} className="text-black" />
         </button>
@@ -44,9 +51,14 @@ function StoreShellContent() {
         <button type="button" className="p-2" aria-label="More">
           <MoreVertical size={22} />
         </button>
-      </header>
+      </motion.header>
 
-      <div className="flex border-b border-border">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="flex border-b border-border"
+      >
         {TABS.map(({ id, label }) => (
           <button
             key={id}
@@ -61,7 +73,7 @@ function StoreShellContent() {
             {label}
           </button>
         ))}
-      </div>
+      </motion.div>
 
       <div className="flex-1 overflow-y-auto">
         {tab === "front" && <StoreFrontTab />}

@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FigmaProgressBar } from "@/components/onboarding/FigmaProgressBar";
 import { OnboardingSlide } from "@/components/onboarding/OnboardingSlide";
 import { OnboardingButton } from "@/components/onboarding/OnboardingButton";
+import { ease, fadeUp, slideLeft } from "@/lib/motion";
 
 const slides = [
   {
@@ -43,10 +44,10 @@ export default function OnboardingPage() {
         <AnimatePresence mode="wait">
           <motion.div
             key={page}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.45, ease: [0.33, 1, 0.68, 1] }}
+            initial="hidden"
+            animate="visible"
+            exit={{ opacity: 0, x: -40, transition: { duration: 0.35, ease } }}
+            variants={slideLeft}
             className="h-full"
           >
             <OnboardingSlide
@@ -59,9 +60,14 @@ export default function OnboardingPage() {
         </AnimatePresence>
       </div>
 
-      <div className="px-8 pb-10 pt-4 max-w-lg mx-auto w-full">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="mx-auto w-full max-w-md px-8 pb-10 pt-4"
+      >
         <OnboardingButton isLast={isLast} onClick={handleNext} />
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { MockProducts } from "@/lib/data/mock-products";
 import { MockStore } from "@/lib/data/mock-store";
 import { SafeImage } from "@/components/ui/SafeImage";
+import { fadeUp, scaleIn, stagger, viewport } from "@/lib/motion";
 
 export function StoreProductsTab() {
   const router = useRouter();
@@ -13,12 +14,12 @@ export function StoreProductsTab() {
   const products = MockProducts.items;
 
   return (
-    <div className="space-y-5 p-4 pb-6">
+    <div className="space-y-5 px-4 py-4 pb-6 sm:px-6 lg:px-8">
       <motion.button
         type="button"
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
+        initial="hidden"
+        animate="visible"
+        variants={scaleIn}
         onClick={() => router.push(`/product/${hero.id}`)}
         className="relative block h-[210px] w-full overflow-hidden rounded-2xl text-left"
       >
@@ -31,16 +32,27 @@ export function StoreProductsTab() {
         </div>
       </motion.button>
 
-      <h2 className="text-base font-bold">All Products ({products.length})</h2>
+      <motion.h2
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="text-base font-bold"
+      >
+        All Products ({products.length})
+      </motion.h2>
 
-      <div className="space-y-3">
-        {products.map((p, i) => (
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewport}
+        variants={stagger}
+        className="space-y-3"
+      >
+        {products.map((p) => (
           <motion.button
             key={p.id}
             type="button"
-            initial={{ opacity: 0, y: 14, scale: 0.94 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.48, delay: (i % 8) * 0.055 }}
+            variants={scaleIn}
             onClick={() => router.push(`/product/${p.id}`)}
             className="flex w-full items-center gap-3 rounded-[14px] border border-border/60 bg-white p-3 shadow-[0_5px_14px_rgba(0,0,0,0.08)]"
           >
@@ -57,7 +69,7 @@ export function StoreProductsTab() {
             </div>
           </motion.button>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }

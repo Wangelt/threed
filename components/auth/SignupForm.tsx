@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { AppTextField } from "@/components/ui/AppTextField";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { SocialIcon } from "@/components/ui/SocialIcon";
 import { useAppSelector } from "@/store/hooks";
+import { fadeUp, stagger } from "@/lib/motion";
 
 interface SignupFormProps {
   embedded?: boolean;
@@ -21,26 +23,34 @@ export function SignupForm({ embedded = false }: SignupFormProps) {
   }
 
   return (
-    <div className={`px-6 ${embedded ? "pt-6" : "pt-3"}`}>
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={stagger}
+      className={`px-6 ${embedded ? "pt-6" : "pt-3"}`}
+    >
       {!embedded && (
         <>
-          <div className="flex justify-center">
+          <motion.div variants={fadeUp} className="flex justify-center">
             <AppLogo />
-          </div>
+          </motion.div>
           <div className="h-8" />
         </>
       )}
 
-      <h2 className="text-xl font-bold">Manual Sign Up</h2>
-      <div className="mt-5 space-y-4">
+      <motion.h2 variants={fadeUp} className="text-xl font-bold">
+        Manual Sign Up
+      </motion.h2>
+      <motion.div variants={fadeUp} className="mt-5 space-y-4">
         <AppTextField label="Username" hint="Johnappleseed" />
         <AppTextField label="Email ID" hint="qadfru@Al.com" />
         <AppTextField label="Password" hint="" obscure />
         <AppTextField label="Confirm Password" hint="" obscure />
-      </div>
+      </motion.div>
 
-      <button
+      <motion.button
         type="button"
+        variants={fadeUp}
         onClick={openTerms}
         className="mt-4 flex items-start gap-2.5 text-left w-full"
       >
@@ -56,28 +66,28 @@ export function SignupForm({ embedded = false }: SignupFormProps) {
           <span className="text-black font-semibold underline">Terms of Use</span> and{" "}
           <span className="text-black font-semibold underline">Privacy Policy.</span>
         </p>
-      </button>
+      </motion.button>
 
-      <div className="mt-6">
+      <motion.div variants={fadeUp} className="mt-6">
         <PrimaryButton
           label="Sign Up"
           disabled={!agreed}
           onClick={agreed ? () => router.push("/otp") : undefined}
         />
-      </div>
+      </motion.div>
 
-      <div className="mt-6 flex items-center gap-2">
+      <motion.div variants={fadeUp} className="mt-6 flex items-center gap-2">
         <div className="flex-1 h-px bg-border" />
         <span className="text-xs text-text-secondary px-2">Connect with Social Media</span>
         <div className="flex-1 h-px bg-border" />
-      </div>
+      </motion.div>
 
-      <div className="mt-4 flex justify-center gap-4">
+      <motion.div variants={fadeUp} className="mt-4 flex justify-center gap-4">
         <SocialIcon label="f" />
         <SocialIcon label="G" />
-      </div>
+      </motion.div>
 
       <div className="h-6" />
-    </div>
+    </motion.div>
   );
 }
