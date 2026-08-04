@@ -2,11 +2,13 @@
 
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { motion } from "framer-motion";
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
 import { MockProducts } from "@/lib/data/mock-products";
 import type { ProductModel } from "@/lib/data/mock-products";
 import { ProductGrid } from "@/components/product/ProductGrid";
 import { FilterSheet } from "@/components/modals/FilterSheet";
+import { fadeUp } from "@/lib/motion";
 
 function SearchResultsContent() {
   const router = useRouter();
@@ -20,8 +22,13 @@ function SearchResultsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
-      <header className="sticky top-0 z-40 flex items-center gap-2 border-b border-border bg-white px-2 py-3">
+    <div className="min-h-screen bg-white px-4 sm:px-6 lg:px-8">
+      <motion.header
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="sticky top-0 z-40 flex items-center gap-2 border-b border-border bg-white py-3"
+      >
         <button type="button" onClick={() => router.back()} className="p-2">
           <ArrowLeft size={22} className="text-black" />
         </button>
@@ -31,9 +38,9 @@ function SearchResultsContent() {
         <button type="button" onClick={() => setFilterOpen(true)} className="p-2" aria-label="Filter">
           <SlidersHorizontal size={22} className="text-black" />
         </button>
-      </header>
+      </motion.header>
 
-      <div className="mx-auto max-w-lg px-4 py-4 lg:max-w-5xl">
+      <div className="mx-auto w-full py-4">
         <ProductGrid products={results} onProductTap={handleProductTap} />
       </div>
 

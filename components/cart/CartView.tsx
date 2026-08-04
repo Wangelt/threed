@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Check, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
@@ -9,6 +10,7 @@ import {
   selectCartTotal,
 } from "@/store/slices/cartSlice";
 import { ProductImage } from "@/components/product/ProductImage";
+import { fadeUp, stagger, viewport } from "@/lib/motion";
 
 interface CartViewProps {
   showBack?: boolean;
@@ -22,7 +24,12 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
 
   return (
     <div className="flex h-full flex-col bg-white">
-      <header className="flex items-center justify-between border-b border-border px-2 py-3">
+      <motion.header
+        initial="hidden"
+        animate="visible"
+        variants={fadeUp}
+        className="flex items-center justify-between border-b border-border px-2 py-3 sm:px-4 lg:px-6"
+      >
         {showBack ? (
           <button type="button" onClick={onBack} className="p-2 text-sm text-black">
             ← Back
@@ -30,20 +37,33 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
         ) : (
           <div className="w-10" />
         )}
-        <h1 className="text-[17px] font-semibold text-black">My Cart</h1>
+        <h1 className="text-lg font-bold text-black">My Cart</h1>
         <button type="button" className="p-2" aria-label="Delete">
           <Trash2 size={22} className="text-black" />
         </button>
-      </header>
+      </motion.header>
 
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 lg:px-8">
         {items.length === 0 ? (
-          <p className="py-12 text-center text-text-secondary">Your cart is empty</p>
+          <motion.p
+            initial="hidden"
+            animate="visible"
+            variants={fadeUp}
+            className="py-12 text-center text-text-secondary"
+          >
+            Your cart is empty
+          </motion.p>
         ) : (
-          <ul className="space-y-3">
+          <motion.ul
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+            className="grid gap-3 md:grid-cols-2 xl:grid-cols-3"
+          >
             {items.map((item, index) => (
-              <li
+              <motion.li
                 key={item.product.id}
+                variants={fadeUp}
                 className={`flex items-center gap-3 rounded-[14px] border p-3 transition-colors duration-250 ${
                   item.selected
                     ? "border-border bg-white"
@@ -84,14 +104,20 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
                     onClick={() => dispatch(incrementQuantity(index))}
                   />
                 </div>
-              </li>
+              </motion.li>
             ))}
-          </ul>
+          </motion.ul>
         )}
       </div>
 
-      <div className="border-t border-transparent bg-white p-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)]">
-        <div className="mx-auto flex max-w-lg items-center gap-4 lg:max-w-5xl">
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={viewport}
+        variants={fadeUp}
+        className="border-t border-transparent bg-white px-4 py-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:px-6 lg:px-8"
+      >
+        <div className="flex w-full items-center gap-4">
           <div className="flex-1">
             <p className="text-xs text-text-secondary">Total</p>
             <p className="text-xl font-extrabold transition-transform duration-300">
@@ -109,7 +135,7 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
             <ArrowRight size={18} />
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
