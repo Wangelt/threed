@@ -15,6 +15,15 @@ export interface ProductModel {
   colors: string[];
 }
 
+export interface HeroSlide {
+  id: string;
+  image: string;
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  href: string;
+}
+
 export const MockProducts = {
   categories: [
     { name: "Models", icon: Box },
@@ -30,6 +39,33 @@ export const MockProducts = {
 
   onboardImages: ["/images/onboard1.jpg", "/images/onboard2.jpg"],
   bannerImage: "/images/banner.jpg",
+
+  heroSlides: [
+    {
+      id: "hero-1",
+      image: "/images/banner.jpg",
+      eyebrow: "FEATURED",
+      title: "Precision prints for modern spaces",
+      subtitle: "Discover models, cases, and custom pieces",
+      href: "/search/results?q=Featured",
+    },
+    {
+      id: "hero-2",
+      image: "/images/onboard1.jpg",
+      eyebrow: "NEW",
+      title: "Workshop-grade detail",
+      subtitle: "Lattice structures and display pieces",
+      href: "/search/results?q=Models",
+    },
+    {
+      id: "hero-3",
+      image: "/images/p1.jpg",
+      eyebrow: "SHOP",
+      title: "Build your collection",
+      subtitle: "Browse bestsellers and limited drops",
+      href: "/search/results?q=All+Products",
+    },
+  ] satisfies HeroSlide[],
 
   items: [
     {
