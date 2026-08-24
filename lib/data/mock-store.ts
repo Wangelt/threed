@@ -6,7 +6,7 @@ export interface StoreReview {
 }
 
 export const MockStore = {
-  name: "3D Game Store",
+  name: "Threedus Store",
   tagline: "Premium 3D Prints & Custom Models",
   rating: 4.9,
   totalReviews: 384,

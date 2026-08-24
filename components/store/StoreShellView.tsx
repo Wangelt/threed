@@ -44,7 +44,7 @@ function StoreShellContent() {
         <button type="button" onClick={() => router.back()} className="p-2">
           <ArrowLeft size={22} className="text-black" />
         </button>
-        <h1 className="flex-1 text-center text-[17px] font-bold">3D Game Store</h1>
+        <h1 className="flex-1 text-center text-[17px] font-bold">Threedus Store</h1>
         <button type="button" className="p-2" aria-label="Search">
           <Search size={22} />
         </button>

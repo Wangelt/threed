@@ -21,7 +21,7 @@ export function ProductDetailView({ product }: ProductDetailViewProps) {
   const [variantOpen, setVariantOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-white pb-28">
+    <div className="flex items-center min-h-screen bg-white pb-28">
       <div className="grid w-full gap-6 px-4 py-4 sm:px-6 lg:grid-cols-2 lg:gap-10 lg:px-8 lg:py-8">
         <div className="relative">
           <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between px-2 py-3 lg:px-0">

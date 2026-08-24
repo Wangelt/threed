@@ -34,11 +34,11 @@ export function BottomSheet({ open, onClose, children, maxHeight = "85vh" }: Bot
             onClick={onClose}
           />
           <motion.div
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "100%" }}
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
             transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-2xl flex-col rounded-t-[20px] bg-white"
+            className="fixed inset-y-0 bottom-0  right-0 z-50 mx-auto flex w-full max-w-md min-h-screen flex-col  bg-white"
             style={{ maxHeight }}
           >
             {children}
@@ -51,8 +51,8 @@ export function BottomSheet({ open, onClose, children, maxHeight = "85vh" }: Bot
 
 function SheetHandle() {
   return (
-    <div className="flex justify-center pt-3">
-      <div className="h-1 w-10 rounded-sm bg-border" />
+    <div className="flex flex-col justify-center   pt-3"> 
+      <button className="h-10 w-10 flex justify-center items-center rounded-sm bg-border  ml-5 "  > &lsaquo; </button>
     </div>
   );
 }

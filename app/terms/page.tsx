@@ -39,7 +39,7 @@ export default function TermsPage() {
         className="flex-1 overflow-y-auto px-6 py-6"
       >
         <motion.h2 variants={fadeUp} className="text-xl font-bold">
-          Welcome to 3D Game
+          Welcome to Threedus
         </motion.h2>
         <motion.p
           variants={fadeUp}
@@ -48,7 +48,7 @@ export default function TermsPage() {
           {`By using our application, you agree to comply with and be bound by the following terms and conditions. Please review them carefully before using our services.
 
 1. Acceptance of Terms
-By accessing or using 3D Game, you agree to be bound by these Terms of Use and all applicable laws and regulations.
+By accessing or using Threedus, you agree to be bound by these Terms of Use and all applicable laws and regulations.
 
 2. Use of Service
 You may use our service for lawful purposes only. You agree not to use the service in any way that violates any applicable laws.
@@ -63,7 +63,7 @@ All 3D printed products are subject to availability. We reserve the right to mod
 Your privacy is important to us. Please review our Privacy Policy to understand how we collect and use your information.
 
 6. Limitation of Liability
-3D Game shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service.`}
+Threedus shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service.`}
         </motion.p>
       </motion.div>
 

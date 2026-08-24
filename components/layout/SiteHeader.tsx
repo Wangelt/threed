@@ -36,7 +36,7 @@ export function SiteHeader() {
         <Link href="/home" className="flex shrink-0 items-center gap-2.5">
           <AppLogo size={36} />
           <div className="hidden sm:block">
-            <p className="text-sm font-bold leading-tight text-black">3D Game</p>
+            <p className="text-sm font-bold leading-tight text-black">Threedus</p>
             <p className="text-[11px] leading-tight text-text-secondary">Premium 3D Prints</p>
           </div>
         </Link>

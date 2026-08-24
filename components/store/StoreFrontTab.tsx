@@ -23,7 +23,7 @@ export function StoreFrontTab() {
     >
       <motion.div
         variants={scaleIn}
-        className="relative h-[180px] overflow-hidden rounded-2xl"
+        className="relative h-[400px] overflow-hidden rounded-2xl"
       >
         <SafeImage src={MockProducts.bannerImage} alt="Featured collection" fill className="object-cover brightness-[0.6]" />
         <div className="absolute inset-x-5 bottom-5">

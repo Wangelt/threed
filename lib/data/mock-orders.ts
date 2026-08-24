@@ -72,8 +72,8 @@ export const MockOrders = {
     { title: "Out for delivery", location: "Kathmandu Hub", date: "Jul 28, 2026", time: "08:15 AM" },
     { title: "Arrived at sorting center", location: "Kathmandu Hub", date: "Jul 27, 2026", time: "06:40 PM" },
     { title: "In transit", location: "Regional Facility", date: "Jul 26, 2026", time: "02:20 PM" },
-    { title: "Shipped", location: "3D Game Warehouse", date: "Jul 25, 2026", time: "11:00 AM" },
-    { title: "Order processed", location: "3D Game Warehouse", date: "Jul 24, 2026", time: "09:30 AM" },
+    { title: "Shipped", location: "Threedus Warehouse", date: "Jul 25, 2026", time: "11:00 AM" },
+    { title: "Order processed", location: "Threedus Warehouse", date: "Jul 24, 2026", time: "09:30 AM" },
   ],
 
   shippingSteps: ["Processing", "Shipped", "In Transit", "Delivered"],

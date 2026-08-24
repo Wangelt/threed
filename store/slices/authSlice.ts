@@ -4,12 +4,16 @@ interface AuthState {
   phone: string;
   otpDigits: string[];
   termsAgreed: boolean;
+  isAuthenticated: boolean;
+  uid: string | null;
 }
 
 const initialState: AuthState = {
   phone: "",
-  otpDigits: ["", "", "", ""],
+  otpDigits: ["", "", "", "", "", ""], // 6-digit OTP
   termsAgreed: false,
+  isAuthenticated: false,
+  uid: null,
 };
 
 export const authSlice = createSlice({
@@ -37,10 +41,21 @@ export const authSlice = createSlice({
       if (lastIndex !== undefined) state.otpDigits[lastIndex] = "";
     },
     resetOtp(state) {
-      state.otpDigits = ["", "", "", ""];
+      state.otpDigits = ["", "", "", "", "", ""];
     },
     setTermsAgreed(state, action: PayloadAction<boolean>) {
       state.termsAgreed = action.payload;
+    },
+    setAuthenticated(state, action: PayloadAction<{ uid: string }>) {
+      state.isAuthenticated = true;
+      state.uid = action.payload.uid;
+    },
+    logout(state) {
+      state.isAuthenticated = false;
+      state.uid = null;
+      state.phone = "";
+      state.otpDigits = ["", "", "", "", "", ""];
+      state.termsAgreed = false;
     },
   },
 });
@@ -54,6 +69,8 @@ export const {
   backspaceOtp,
   resetOtp,
   setTermsAgreed,
+  setAuthenticated,
+  logout,
 } = authSlice.actions;
 
 export const selectOtpComplete = (state: { auth: AuthState }) =>

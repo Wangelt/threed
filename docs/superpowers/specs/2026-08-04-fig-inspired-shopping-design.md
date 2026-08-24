@@ -18,7 +18,7 @@ Make shopping surfaces feel like a premium lifestyle ecommerce site in the spiri
 | Scope this pass | Shopping showcase: home + product card/detail first; light pass on search/store/cart |
 | Colors | **Unchanged** — keep `lib/colors.ts` / `app/globals.css` tokens |
 | Motion | **Unchanged** — keep `lib/motion.ts` variants and usage patterns |
-| Brand | Keep 3D Game / 3D prints identity and mock product data |
+| Brand | Keep Threedus / 3D prints identity and mock product data |
 
 ## Out of scope
 
@@ -57,7 +57,7 @@ Replace the current inset “BEST DEALS” card + icon row + Flash Sales block w
 1. **Full-bleed hero carousel** — edge-to-edge (within page padding rules consistent with shell), primary CTA (“Shop Now”), dots/arrows; uses existing banner/product imagery from mocks
 2. **Shop by type** — category tiles from `MockProducts.categories` (or a small curated subset), editorial label `SHOP BY TYPE`, larger tap targets than current icon circles
 3. **New arrivals row** — horizontally scrollable product row (reuse `ProductCard` or a compact variant)
-4. **Brand story strip** — short 3D Game sanctuary/workshop blurb + “Shop All” linking to search results; not FIG copy
+4. **Brand story strip** — short Threedus sanctuary/workshop blurb + "Shop All" linking to search results; not FIG copy
 5. **Product grid** — existing grid of catalog items below
 
 Keep page transitions and scroll reveals via current motion helpers.

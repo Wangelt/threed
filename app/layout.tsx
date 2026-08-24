@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "3D Game",
+  title: "Threedus",
   description: "Premium 3D Prints & Custom Models",
 };
 

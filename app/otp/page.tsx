@@ -1,96 +1,201 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
-import { PrimaryButton } from "@/components/ui/PrimaryButton";
-import { NumericKeypad } from "@/components/ui/NumericKeypad";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import { fillNextOtpDigit, backspaceOtp, selectOtpComplete } from "@/store/slices/authSlice";
-import { fadeUp, scaleIn, stagger } from "@/lib/motion";
 
-const DEFAULT_PHONE = "+44 8580 0660 309";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import {
+  fillNextOtpDigit,
+  backspaceOtp,
+} from "@/store/slices/authSlice";
+import { fadeUp, scaleIn, stagger } from "@/lib/motion";
+import { verifyPhoneOtp } from "@/lib/firebase-phone-auth";
+import { getOtpConfirmation, clearOtpConfirmation } from "@/lib/phone-otp-state";
+import { api } from "@/lib/api";
+
+const DEFAULT_PHONE = "+91 98765 43210";
 
 function OtpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const otpDigits = useAppSelector((s) => s.auth.otpDigits);
-  const isComplete = useAppSelector(selectOtpComplete);
   const phoneNumber = searchParams.get("phone") ?? DEFAULT_PHONE;
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const handleVerifyOtp = async () => {
+    try {
+      setIsVerifying(true);
+      setError("");
+
+      const otp = otpDigits.join("");
+      const confirmation = getOtpConfirmation();
+
+      if (!confirmation) {
+        throw new Error("OTP session expired. Please try again.");
+      }
+
+      // Verify OTP with Firebase
+      const { idToken } = await verifyPhoneOtp(otp, confirmation);
+
+      // Create server session
+      await api.auth.firebasePhoneLogin(idToken);
+
+      // Clear stored confirmation
+      clearOtpConfirmation();
+
+      // Redirect to home
+      router.replace("/");
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : "Verification failed";
+      setError(errorMessage);
+      console.error("OTP verification error:", err);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const focusInput = () => inputRef.current?.focus();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value.replace(/\D/g, "");
+    if (!value) return;
+    for (const char of value) {
+      dispatch(fillNextOtpDigit(char));
+    }
+    e.target.value = "";
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Backspace") {
+      e.preventDefault();
+      dispatch(backspaceOtp());
+    }
+  };
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-white">
-      <div className="mx-auto flex w-full max-w-md flex-1 flex-col">
-      <motion.header
-        initial="hidden"
-        animate="visible"
-        variants={fadeUp}
-        className="px-2 py-3"
-      >
-        <button type="button" onClick={() => router.back()} className="p-2">
-          <ArrowLeft size={22} className="text-black" />
-        </button>
-      </motion.header>
-
-      <motion.div
-        initial="hidden"
-        animate="visible"
-        variants={stagger}
-        className="flex-1 px-6"
-      >
-        <div className="h-2" />
-        <motion.h1 variants={fadeUp} className="text-[22px] font-bold">
-          Verify your Phone Number
-        </motion.h1>
-        <motion.p variants={fadeUp} className="mt-2 text-[13px] leading-[1.5] text-text-secondary">
-          Enter the 4 digit PIN that we sent to
-          <br />
-          <span className="font-semibold text-black">{phoneNumber}</span>
+    <div className="relative flex min-h-screen items-stretch overflow-hidden bg-black">
+      <div className="relative hidden w-[46%] flex-col justify-between border-r border-white/10 p-10 text-white lg:flex">
+        <motion.div initial="hidden" animate="visible" variants={fadeUp}>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-sidebar-text">
+            Workshop console
+          </p>
+          <h1 className="font-display mt-4 text-5xl leading-[1.05] font-semibold tracking-[-0.02em]">
+            Confirm the line
+            <br />
+            before you enter.
+          </h1>
+        </motion.div>
+        <motion.p
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="max-w-sm text-sm leading-relaxed text-sidebar-text"
+        >
+          A 6-digit verification code keeps your account secure.
         </motion.p>
+      </div>
 
-        <motion.div variants={stagger} className="mt-8 flex justify-between gap-3">
-          {otpDigits.map((digit, index) => {
-            const filled = digit !== "";
-            return (
+      <div className="relative flex flex-1 items-center justify-center bg-background px-4 py-10">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={stagger}
+          className="w-full max-w-md border border-border bg-card p-8"
+        >
+          <motion.button
+            type="button"
+            variants={fadeUp}
+            onClick={() => router.back()}
+            className="mb-6 inline-flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-muted"
+          >
+            <ArrowLeft size={16} className="text-ink" />
+            Back
+          </motion.button>
+
+          <motion.p
+            variants={fadeUp}
+            className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted"
+          >
+            ThreedUs
+          </motion.p>
+          <motion.h2
+            variants={fadeUp}
+            className="font-display mt-2 text-4xl font-semibold tracking-[-0.02em] text-ink"
+          >
+            Verify phone
+          </motion.h2>
+          <motion.p variants={fadeUp} className="mt-2 text-sm leading-relaxed text-muted">
+            Enter the 6 digit code sent to{" "}
+            <span className="font-semibold text-ink">{phoneNumber}</span>
+          </motion.p>
+
+          <motion.div
+            variants={stagger}
+            className="relative mt-7 flex justify-between gap-2 sm:gap-3"
+            onClick={focusInput}
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              maxLength={6}
+              aria-label="6 digit verification code"
+              className="absolute inset-0 z-10 cursor-text opacity-0"
+              onChange={handleChange}
+              onKeyDown={handleKeyDown}
+            />
+            {otpDigits.map((digit, index) => (
               <motion.div
                 key={index}
                 variants={scaleIn}
-                className={`flex h-16 w-16 items-center justify-center rounded-xl text-2xl font-semibold transition-all duration-200 ${
-                  filled
-                    ? "border-[1.4px] border-black bg-white"
-                    : "border border-border bg-surface"
+                className={`pointer-events-none flex h-14 min-w-0 flex-1 items-center justify-center text-2xl font-semibold sm:h-16 ${
+                  digit
+                    ? "border border-ink bg-white text-ink"
+                    : "border border-border bg-white text-ink"
                 }`}
               >
                 {digit}
               </motion.div>
-            );
-          })}
-        </motion.div>
+            ))}
+          </motion.div>
 
-        <motion.div variants={fadeUp} className="mt-6 text-center">
-          <button type="button" className="text-sm text-black">
-            Resend PIN
-          </button>
-        </motion.div>
+          {error && (
+            <motion.div variants={fadeUp} className="mt-4 rounded bg-red-50 p-3 text-sm text-red-700 border border-red-200">
+              {error}
+            </motion.div>
+          )}
 
-        <motion.div
-          variants={fadeUp}
-          className={`mt-4 transition-opacity duration-250 ${isComplete ? "opacity-100" : "opacity-40"}`}
-        >
-          <PrimaryButton
-            label="Verify"
-            disabled={!isComplete}
-            onClick={isComplete ? () => router.push("/phone") : undefined}
-          />
-        </motion.div>
-      </motion.div>
+          <motion.div variants={fadeUp} className="mt-5 text-center">
+            <button
+              type="button"
+              onClick={handleVerifyOtp}
+              disabled={isVerifying || otpDigits.some(d => !d)}
+              className="inline-flex items-center justify-center bg-black py-3 px-5 gap-2 text-sm font-semibold text-white *:disabled:opacity-50"
+            >
+              {isVerifying ? "Verifying..." : "Verify Code"}
+            </button>
+          </motion.div>
 
-      <NumericKeypad
-        onKeyTap={(key) => dispatch(fillNextOtpDigit(key))}
-        onBackspace={() => dispatch(backspaceOtp())}
-      />
+          <motion.p
+            variants={fadeUp}
+            className="mt-4 text-center text-xs text-muted"
+          >
+            Didn&apos;t receive the code? <br />
+            <button type="button" className="font-semibold text-ink hover:underline">
+              Resend
+            </button>
+          </motion.p>
+        </motion.div>
       </div>
     </div>
   );
@@ -98,7 +203,7 @@ function OtpContent() {
 
 export default function OtpPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-white" />}>
+    <Suspense fallback={<div>Loading...</div>}>
       <OtpContent />
     </Suspense>
   );

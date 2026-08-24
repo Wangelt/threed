@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/layout/SiteHeader";
 
 const HIDE_HEADER_PREFIXES = [
   "/auth",
-  "/onboarding",
   "/otp",
   "/phone",
   "/terms",

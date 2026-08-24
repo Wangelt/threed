@@ -38,7 +38,7 @@ export const MockProducts = {
   trendingSearches: ["3D Printed Model", "Phone Case", "Gift Bottle", "Mechanical Parts"],
 
   onboardImages: ["/images/onboard1.jpg", "/images/onboard2.jpg"],
-  bannerImage: "/images/banner.jpg",
+  bannerImage: "/images/banner.png",
 
   heroSlides: [
     {
@@ -71,7 +71,7 @@ export const MockProducts = {
     {
       id: "1",
       name: "3D Printed Model",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹4,000",
       rating: 4.9,
       reviews: 128,
@@ -85,7 +85,7 @@ export const MockProducts = {
     {
       id: "2",
       name: "Phone Case",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹1,600",
       rating: 4.7,
       reviews: 89,
@@ -98,7 +98,7 @@ export const MockProducts = {
     {
       id: "3",
       name: "Gift Bottle",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹1,800",
       rating: 4.8,
       reviews: 56,
@@ -111,7 +111,7 @@ export const MockProducts = {
     {
       id: "4",
       name: "Mobile Cover",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹1,200",
       rating: 4.6,
       reviews: 203,
@@ -150,7 +150,7 @@ export const MockProducts = {
     {
       id: "7",
       name: "Lattice Desk Organizer",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹2,200",
       rating: 4.8,
       reviews: 94,
@@ -163,7 +163,7 @@ export const MockProducts = {
     {
       id: "8",
       name: "Mechanical Gear Set",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹3,200",
       rating: 4.7,
       reviews: 76,
@@ -176,7 +176,7 @@ export const MockProducts = {
     {
       id: "9",
       name: "Custom Keycap Set",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹2,800",
       rating: 4.6,
       reviews: 142,
@@ -189,7 +189,7 @@ export const MockProducts = {
     {
       id: "10",
       name: "Miniature Figurine",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹5,500",
       rating: 4.9,
       reviews: 58,
@@ -202,7 +202,7 @@ export const MockProducts = {
     {
       id: "11",
       name: "Smartwatch Stand",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹950",
       rating: 4.4,
       reviews: 211,
@@ -215,7 +215,7 @@ export const MockProducts = {
     {
       id: "12",
       name: "Resin Vase Collection",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹2,400",
       rating: 4.8,
       reviews: 67,
@@ -228,7 +228,7 @@ export const MockProducts = {
     {
       id: "13",
       name: "Cable Management Clip",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹650",
       rating: 4.3,
       reviews: 318,
@@ -241,7 +241,7 @@ export const MockProducts = {
     {
       id: "14",
       name: "Architectural Model Kit",
-      brand: "3D Game",
+      brand: "Threedus",
       price: "₹6,800",
       rating: 4.9,
       reviews: 41,

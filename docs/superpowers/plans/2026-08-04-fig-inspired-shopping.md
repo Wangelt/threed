@@ -398,7 +398,7 @@ export function BrandStory() {
         WELCOME TO
       </p>
       <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-text-primary sm:text-3xl">
-        3D GAME
+        Threedus
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed text-text-secondary sm:text-[15px]">
         We design and print pieces meant for the hours after work — display models,
