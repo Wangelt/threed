@@ -16,7 +16,10 @@ function LoginPageContent() {
   const [error, setError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get("redirect") || "/store";
+  const rawRedirect = searchParams.get("redirect") || "/home";
+  const redirectTo = rawRedirect.startsWith("/") && !rawRedirect.startsWith("/auth") && !rawRedirect.startsWith("/otp") && !rawRedirect.startsWith("/phone")
+    ? rawRedirect
+    : "/home";
 
   useEffect(() => clearRecaptcha, []);
 

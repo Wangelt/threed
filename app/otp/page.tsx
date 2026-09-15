@@ -24,7 +24,10 @@ function OtpContent() {
   const dispatch = useAppDispatch();
   const otpDigits = useAppSelector((s) => s.auth.otpDigits);
   const phoneNumber = searchParams.get("phone") ?? DEFAULT_PHONE;
-  const redirectTo = searchParams.get("redirect") || "/store";
+  const rawRedirect = searchParams.get("redirect") || "/home";
+  const redirectTo = rawRedirect.startsWith("/") && !rawRedirect.startsWith("/auth") && !rawRedirect.startsWith("/otp") && !rawRedirect.startsWith("/phone")
+    ? rawRedirect
+    : "/home";
   const inputRef = useRef<HTMLInputElement>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
