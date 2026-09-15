@@ -1,19 +1,22 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { FormEvent, Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   clearRecaptcha,
   requestPhoneOtp,
   formatPhoneNumber,
   isValidPhoneNumber,
 } from "@/lib/firebase-phone-auth";
+import { phoneSchema } from "@/lib/schemas";
 
-export default function LoginPage() {
+function LoginPageContent() {
   const [phoneInput, setPhoneInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = searchParams.get("redirect") || "/store";
 
   useEffect(() => clearRecaptcha, []);
 
@@ -26,12 +29,15 @@ export default function LoginPage() {
       // Remove any non-digit characters and format phone number
       const digits = phoneInput.replace(/\D/g, "");
 
-      if (digits.length < 10) {
-        throw new Error("Phone number must be at least 10 digits");
+
+      
+
+      const phoneResult = phoneSchema.safeParse(digits);
+      if (!phoneResult.success) {
+        throw new Error(phoneResult.error.issues[0]?.message ?? "Invalid phone number");
       }
 
-      // Format to E.164 format with country code
-      const fullPhone = formatPhoneNumber(digits, "91"); // Using India +91
+      const fullPhone = formatPhoneNumber(digits, "91");
 
       if (!isValidPhoneNumber(fullPhone)) {
         throw new Error("Invalid phone number format");
@@ -41,7 +47,7 @@ export default function LoginPage() {
       await requestPhoneOtp(fullPhone);
 
       // Navigate to OTP verification page
-      router.push(`/otp?phone=${encodeURIComponent(fullPhone)}`);
+      router.push(`/otp?phone=${encodeURIComponent(fullPhone)}&redirect=${encodeURIComponent(redirectTo)}`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Failed to send OTP";
       setError(errorMessage);
@@ -133,5 +139,13 @@ export default function LoginPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
   );
 }
