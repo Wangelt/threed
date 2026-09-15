@@ -211,9 +211,9 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
         description: `Payment for order ${paymentPayload.orderId || orderId}`,
         order_id: paymentPayload.razorpayOrderId,
         prefill: {
-          name: user?.name || address.fullName,
+          name: user?.name || validAddress.fullName,
           email: user?.email || "",
-          contact: address.phone,
+          contact: validAddress.phone,
         },
         theme: {
           color: "#000000",
