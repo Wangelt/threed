@@ -8,7 +8,7 @@ export function proxy(request: NextRequest) {
     (p) => pathname === p || pathname.startsWith(p + "/"),
   );
 
-  if (isProtected && !request.cookies.get("firebaseSession")?.value) {
+  if (isProtected && !request.cookies.get("accessToken")?.value) {
     const loginUrl = new URL("/auth", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
