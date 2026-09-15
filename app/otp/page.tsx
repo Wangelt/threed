@@ -14,6 +14,7 @@ import { fadeUp, scaleIn, stagger } from "@/lib/motion";
 import { verifyPhoneOtp } from "@/lib/firebase-phone-auth";
 import { getOtpConfirmation, clearOtpConfirmation } from "@/lib/phone-otp-state";
 import { api } from "@/lib/api";
+import { otpSchema } from "@/lib/schemas";
 
 const DEFAULT_PHONE = "+91 98765 43210";
 
@@ -23,6 +24,7 @@ function OtpContent() {
   const dispatch = useAppDispatch();
   const otpDigits = useAppSelector((s) => s.auth.otpDigits);
   const phoneNumber = searchParams.get("phone") ?? DEFAULT_PHONE;
+  const redirectTo = searchParams.get("redirect") || "/store";
   const inputRef = useRef<HTMLInputElement>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
@@ -37,6 +39,13 @@ function OtpContent() {
       setError("");
 
       const otp = otpDigits.join("");
+
+      const otpResult = otpSchema.safeParse(otp);
+      if (!otpResult.success) {
+        setError(otpResult.error.issues[0]?.message ?? "Invalid OTP");
+        return;
+      }
+
       const confirmation = getOtpConfirmation();
 
       if (!confirmation) {
@@ -52,8 +61,8 @@ function OtpContent() {
       // Clear stored confirmation
       clearOtpConfirmation();
 
-      // Redirect to home
-      router.replace("/");
+      // Redirect to the requested page after login
+      router.replace(redirectTo);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Verification failed";
       setError(errorMessage);
