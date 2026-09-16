@@ -1,5 +1,3 @@
-import { notFound } from "next/navigation";
-import { MockOrders } from "@/lib/data/mock-orders";
 import { TrackPackageView } from "@/components/order/TrackPackageView";
 
 interface TrackPageProps {
@@ -8,8 +6,5 @@ interface TrackPageProps {
 
 export default async function TrackPage({ params }: TrackPageProps) {
   const { id } = await params;
-  const order = MockOrders.orders.find((o) => o.id === decodeURIComponent(id));
-  if (!order) notFound();
-
-  return <TrackPackageView order={order} />;
+  return <TrackPackageView orderId={decodeURIComponent(id)} />;
 }

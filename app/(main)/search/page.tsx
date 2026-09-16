@@ -1,17 +1,61 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Search, X, ChevronRight, TrendingUp } from "lucide-react";
-import { MockProducts } from "@/lib/data/mock-products";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { fadeUp, scaleIn, stagger, viewport } from "@/lib/motion";
+import { api } from "@/lib/api";
+import type { ProductModel } from "@/lib/data/mock-products";
+
+interface Category {
+  _id?: string;
+  name: string;
+  slug?: string;
+  icon?: React.ComponentType<any>;
+}
+
+interface TrendingProduct {
+  _id?: string;
+  slug?: string;
+  title: string;
+  images?: string[];
+  variants?: { price?: number }[];
+}
+
+function toTrendingProduct(source: TrendingProduct): ProductModel {
+  const variant = source.variants?.[0];
+  return {
+    id: source.slug || source._id || source.title,
+    name: source.title,
+    brand: "Threedus",
+    price: `₹${variant?.price?.toLocaleString("en-IN") || "0"}`,
+    rating: 0,
+    reviews: 0,
+    description: "",
+    image: source.images?.[0] || "/images/p1.jpg",
+    gallery: source.images?.length ? source.images : ["/images/p1.jpg"],
+    materials: [],
+    colors: [],
+  };
+}
 
 export default function SearchPage() {
   const router = useRouter();
   const [query, setQuery] = useState("");
   const [focused, setFocused] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [trendingProducts, setTrendingProducts] = useState<ProductModel[]>([]);
+
+  useEffect(() => {
+    api.categories.list()
+      .then((result) => setCategories(((result as { categories?: Category[] }).categories || []).slice(0, 8)))
+      .catch(() => setCategories([]));
+    api.products.list({ sort: "popular", limit: 8 })
+      .then(({ products }) => setTrendingProducts(((products as TrendingProduct[]) || []).map(toTrendingProduct)))
+      .catch(() => setTrendingProducts([]));
+  }, []);
 
   function search(term: string) {
     const trimmed = term.trim();
@@ -69,13 +113,13 @@ export default function SearchPage() {
             variants={stagger}
             className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8"
           >
-            {MockProducts.categories.map(({ name, icon: Icon }) => (
+            {categories.map(({ name }) => (
               <motion.div
                 key={name}
                 variants={scaleIn}
                 className="flex aspect-[1.1] flex-col items-center justify-center rounded-[14px] bg-surface"
               >
-                <Icon size={28} className="text-text-primary" />
+                <span className="text-2xl">📦</span>
                 <span className="mt-1.5 text-xs font-medium">{name}</span>
               </motion.div>
             ))}
@@ -97,7 +141,7 @@ export default function SearchPage() {
             variants={stagger}
             className="mt-3 flex-1 overflow-y-auto pb-4"
           >
-            {MockProducts.items.map((product) => (
+            {trendingProducts.map((product) => (
               <motion.button
                 key={product.id}
                 type="button"
@@ -133,7 +177,7 @@ export default function SearchPage() {
             variants={stagger}
             className="flex flex-wrap gap-2"
           >
-            {MockProducts.recentSearches.map((term) => (
+            {["3D Printed Models", "Phone Cases", "Gift Bottles", "Custom Parts"].map((term) => (
               <motion.button
                 key={term}
                 type="button"
@@ -160,7 +204,7 @@ export default function SearchPage() {
             variants={stagger}
             className="mt-2 grid flex-1 grid-cols-1 gap-x-8 overflow-y-auto pb-4 md:grid-cols-2 lg:grid-cols-3"
           >
-            {MockProducts.trendingSearches.map((term) => (
+            {["Popular this week", "Bestsellers", "New arrivals", "On sale", "Customer favorites", "Trending now"].map((term) => (
               <motion.button
                 key={term}
                 type="button"

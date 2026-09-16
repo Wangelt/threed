@@ -1,27 +1,66 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { MockProducts } from "@/lib/data/mock-products";
 import { MockStore } from "@/lib/data/mock-store";
 import { SafeImage } from "@/components/ui/SafeImage";
 import { fadeUp, scaleIn, stagger, viewport } from "@/lib/motion";
+import { api } from "@/lib/api";
+import type { ProductModel } from "@/lib/data/mock-products";
+
+interface ApiProduct {
+  _id?: string;
+  slug?: string;
+  title: string;
+  shortDesc?: string;
+  description?: string;
+  images?: string[];
+  averageRating?: number;
+  reviewCount?: number;
+  variants?: { material?: string; color?: string; price?: number }[];
+}
+
+function toProductModel(source: ApiProduct): ProductModel {
+  const gallery = source.images?.length ? source.images : ["/images/p1.jpg"];
+  const firstVariant = source.variants?.[0];
+  return {
+    id: source.slug || source._id || source.title,
+    name: source.title,
+    brand: "Threedus",
+    price: `₹${firstVariant?.price?.toLocaleString("en-IN") || "0"}`,
+    rating: source.averageRating || 0,
+    reviews: source.reviewCount || 0,
+    description: source.shortDesc || source.description || "",
+    image: gallery[0],
+    gallery,
+    materials: [...new Set(source.variants?.map((variant) => variant.material).filter(Boolean) as string[])],
+    colors: [...new Set(source.variants?.map((variant) => variant.color).filter(Boolean) as string[])],
+  };
+}
 
 export function StoreProductsTab() {
   const router = useRouter();
-  const hero = MockProducts.byId(MockStore.heroProductId);
-  const products = MockProducts.items;
+  const [products, setProducts] = useState<ProductModel[]>([]);
+
+  useEffect(() => {
+    api.products.list({ limit: 100 })
+      .then(({ products: apiProducts }) => setProducts((apiProducts as ApiProduct[]).map(toProductModel)))
+      .catch(() => setProducts([]));
+  }, []);
+
+  const hero = products[0];
 
   return (
     <div className="space-y-5 px-4 py-4 pb-6 sm:px-6 lg:px-8">
-      <motion.button
+      {hero && <motion.button
         type="button"
         initial="hidden"
         animate="visible"
         variants={scaleIn}
         onClick={() => router.push(`/product/${hero.id}`)}
-        className="relative block h-[210px] w-full overflow-hidden rounded-2xl text-left"
+        className="relative block h-52.5 w-full overflow-hidden rounded-2xl text-left"
       >
         <SafeImage src={hero.image} alt={hero.name} fill className="object-cover" />
         <div className="absolute inset-0 bg-black/28" />
@@ -30,7 +69,7 @@ export function StoreProductsTab() {
           <p className="mt-1 text-lg font-extrabold text-white">{hero.name.toUpperCase()}</p>
           <p className="text-sm font-semibold text-white/90">{hero.price}</p>
         </div>
-      </motion.button>
+      </motion.button>}
 
       <motion.h2
         initial="hidden"
@@ -56,7 +95,7 @@ export function StoreProductsTab() {
             onClick={() => router.push(`/product/${p.id}`)}
             className="flex w-full items-center gap-3 rounded-[14px] border border-border/60 bg-white p-3 shadow-[0_5px_14px_rgba(0,0,0,0.08)]"
           >
-            <div className="relative h-[68px] w-[68px] shrink-0 overflow-hidden rounded-[10px]">
+            <div className="relative h-17 w-17 shrink-0 overflow-hidden rounded-[10px]">
               <SafeImage src={p.image} alt={p.name} fill className="object-cover" />
             </div>
             <div className="min-w-0 flex-1 text-left">

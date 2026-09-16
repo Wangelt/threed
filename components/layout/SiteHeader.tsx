@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingBag, User } from "lucide-react";
 import { AppLogo } from "@/components/ui/AppLogo";
 import { useAppSelector } from "@/store/hooks";
+import Image from "next/image";
 
 export function SiteHeader() {
   const router = useRouter();
@@ -34,11 +35,13 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border/70 bg-white/95 backdrop-blur-sm">
       <div className="flex w-full items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/home" className="flex shrink-0 items-center gap-2.5">
-          <AppLogo size={36} />
-          <div className="hidden sm:block">
-            <p className="text-sm font-bold leading-tight text-black">Threedus</p>
-            <p className="text-[11px] leading-tight text-text-secondary">Premium 3D Prints</p>
-          </div>
+         <Image
+           alt="App Logo"
+           src="/images/logo.png"  
+           width={500}
+           height={500}
+           className="h-20 w-25 "
+         />
         </Link>
 
         <nav className="ml-4 hidden items-center gap-5 lg:flex" aria-label="Primary">

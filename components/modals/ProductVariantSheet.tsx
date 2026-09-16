@@ -9,6 +9,7 @@ import { BottomSheet } from "@/components/modals/BottomSheet";
 import { ProductImage } from "@/components/product/ProductImage";
 import { useAppDispatch } from "@/store/hooks";
 import { addItem } from "@/store/slices/cartSlice";
+import { api } from "@/lib/api";
 
 interface ProductVariantSheetProps {
   product: ProductModel;
@@ -21,11 +22,58 @@ export function ProductVariantSheet({ product, open, onClose }: ProductVariantSh
   const [selectedMaterial, setSelectedMaterial] = useState(0);
   const [selectedColor, setSelectedColor] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
 
-  function handleAddToCart() {
-    dispatch(addItem({ product, quantity }));
-    setQuantity(1);
-    onClose();
+  async function handleAddToCart() {
+    if (isAdding) return;
+
+    setIsAdding(true);
+    try {
+      const result = await api.products.bySlug(product.id) as {
+        product?: {
+          _id?: string;
+          variants?: Array<{
+            _id?: string;
+            material?: string;
+            color?: string;
+          }>;
+        };
+      };
+      const backendProduct = result.product;
+      const variants = backendProduct?.variants || [];
+      const selectedVariant = variants.find(
+        (variant) =>
+          variant.material === product.materials[selectedMaterial] &&
+          variant.color === product.colors[selectedColor]
+      ) || variants.find(
+        (variant) => variant.material === product.materials[selectedMaterial]
+      ) || variants.find(
+        (variant) => variant.color === product.colors[selectedColor]
+      ) || variants[0];
+
+      if (!backendProduct?._id || !selectedVariant?._id) {
+        throw new Error("This product has no available variant.");
+      }
+
+      await api.cart.add({
+        productId: backendProduct._id,
+        variantId: selectedVariant._id,
+        quantity,
+      });
+      dispatch(addItem({ product, quantity }));
+      setQuantity(1);
+      onClose();
+    } catch (error) {
+      if (error && typeof error === "object" && "status" in error && Number((error as { status?: number }).status) === 401) {
+        dispatch(addItem({ product, quantity }));
+        setQuantity(1);
+        onClose();
+      } else {
+        console.error("Unable to add product to cart:", error);
+      }
+    } finally {
+      setIsAdding(false);
+    }
   }
 
   useEffect(() => {
@@ -103,7 +151,7 @@ export function ProductVariantSheet({ product, open, onClose }: ProductVariantSh
         </div>
 
         <div className="mt-6">
-          <PrimaryButton label="Add to Cart" onClick={handleAddToCart} />
+          <PrimaryButton label={isAdding ? "Adding..." : "Add to Cart"} onClick={handleAddToCart} disabled={isAdding} />
         </div>
       </div>
     </BottomSheet>

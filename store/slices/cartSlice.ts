@@ -1,5 +1,4 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { MockProducts } from "@/lib/data/mock-products";
 import type { ProductModel } from "@/lib/data/mock-products";
 
 export interface CartItemModel {
@@ -13,10 +12,7 @@ interface CartState {
 }
 
 const initialState: CartState = {
-  items: [
-    { product: MockProducts.items[4], selected: true, quantity: 1 },
-    { product: MockProducts.items[5], selected: true, quantity: 1 },
-  ],
+  items: [],
 };
 
 function parsePrice(price: string): number {
@@ -52,10 +48,16 @@ export const cartSlice = createSlice({
         });
       }
     },
+    replaceItems(state, action: PayloadAction<CartItemModel[]>) {
+      state.items = action.payload;
+    },
+    clearItems(state) {
+      state.items = [];
+    },
   },
 });
 
-export const { toggleSelected, incrementQuantity, decrementQuantity, addItem } = cartSlice.actions;
+export const { toggleSelected, incrementQuantity, decrementQuantity, addItem, replaceItems, clearItems } = cartSlice.actions;
 
 export function selectCartTotal(state: { cart: CartState }): number {
   return state.cart.items

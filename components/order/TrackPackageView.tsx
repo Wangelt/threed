@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ArrowLeft, Copy } from "lucide-react";
@@ -10,13 +11,27 @@ import { ShippingProgressBar } from "@/components/order/ShippingProgressBar";
 import { TrackingTimeline } from "@/components/order/TrackingTimeline";
 import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { fadeUp, stagger } from "@/lib/motion";
+import { api } from "@/lib/api";
+import { toOrderModel } from "@/lib/order-model";
 
 interface TrackPackageViewProps {
-  order: OrderModel;
+  order?: OrderModel;
+  orderId?: string;
 }
 
-export function TrackPackageView({ order }: TrackPackageViewProps) {
+export function TrackPackageView({ order: initialOrder, orderId }: TrackPackageViewProps) {
   const router = useRouter();
+  const [order, setOrder] = useState(initialOrder);
+
+  useEffect(() => {
+    if (!initialOrder && orderId) {
+      api.orders.byId(orderId).then((result) => {
+        setOrder(toOrderModel((result as { order: Parameters<typeof toOrderModel>[0] }).order));
+      }).catch(() => router.replace("/orders"));
+    }
+  }, [initialOrder, orderId, router]);
+
+  if (!order) return <div className="min-h-screen bg-white" />;
 
   return (
     <div className="min-h-screen bg-white pb-8">

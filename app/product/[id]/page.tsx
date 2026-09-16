@@ -16,13 +16,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
   const source = apiProduct as {
-    _id?: string; title: string; shortDesc?: string; description: string;
+    _id?: string; slug?: string; title: string; shortDesc?: string; description: string;
     images?: string[]; averageRating?: number; reviewCount?: number;
     variants?: { material?: string; color?: string; price?: number }[];
   };
   const firstVariant = source.variants?.[0];
   const product: ProductModel = {
-    id: source._id || id, name: source.title, brand: "Threedus",
+    id: source.slug || id, name: source.title, brand: "Threedus",
     price: firstVariant ? `₹${firstVariant.price?.toLocaleString("en-IN") || "0"}` : "₹0",
     rating: source.averageRating || 0, reviews: source.reviewCount || 0,
     description: source.shortDesc || source.description,

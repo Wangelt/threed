@@ -10,6 +10,7 @@ export const API_CONFIG = {
     products: "/products", cart: "/cart", coupons: "/coupons", orders: "/orders",
     payments: "/payments", wishlist: "/wishlist", reviews: "/reviews",
     notifications: "/notifications", customOrders: "/custom-orders", uploads: "/uploads",
+    users: "/users", adminUsers: "/admin-users", locations: "/locations", inventory: "/inventory",
   },
 } as const;
 
@@ -59,6 +60,25 @@ export const api = {
     resetPassword: (body: unknown) => request(API_CONFIG.endpoints.resetPassword, { method: "POST", body: jsonBody(body) }),
     verifyEmail: (token: string) => request(API_CONFIG.endpoints.verifyEmail, { method: "POST", body: jsonBody({ token }) }),
     logout: (token?: string) => request(API_CONFIG.endpoints.logout, { method: "POST", token, body: jsonBody({}) }),
+  },
+  users: {
+    updateAddresses: (body: unknown, token?: string) => request(`${API_CONFIG.endpoints.users}/addresses`, { method: "PUT", token, body: jsonBody(body) }),
+    byId: (id: string, token?: string) => request(`${API_CONFIG.endpoints.users}/${id}`, { token }),
+  },
+  adminUsers: {
+    list: (query?: ApiRequestOptions["query"], token?: string) => request(API_CONFIG.endpoints.adminUsers, { query, token }),
+    create: (body: unknown, token?: string) => request(API_CONFIG.endpoints.adminUsers, { method: "POST", token, body: jsonBody(body) }),
+    update: (id: string, body: unknown, token?: string) => request(`${API_CONFIG.endpoints.adminUsers}/${id}`, { method: "PATCH", token, body: jsonBody(body) }),
+    block: (id: string, body: unknown, token?: string) => request(`${API_CONFIG.endpoints.adminUsers}/${id}/block`, { method: "PATCH", token, body: jsonBody(body) }),
+  },
+  locations: {
+    list: (query?: ApiRequestOptions["query"], token?: string) => request(API_CONFIG.endpoints.locations, { query, token }),
+    create: (body: unknown, token?: string) => request(API_CONFIG.endpoints.locations, { method: "POST", token, body: jsonBody(body) }),
+    update: (id: string, body: unknown, token?: string) => request(`${API_CONFIG.endpoints.locations}/${id}`, { method: "PATCH", token, body: jsonBody(body) }),
+  },
+  inventory: {
+    list: (query?: ApiRequestOptions["query"], token?: string) => request(API_CONFIG.endpoints.inventory, { query, token }),
+    set: (body: unknown, token?: string) => request(API_CONFIG.endpoints.inventory, { method: "PATCH", token, body: jsonBody(body) }),
   },
   categories: {
     list: () => request<{ categories: unknown[] }>(API_CONFIG.endpoints.categories),
