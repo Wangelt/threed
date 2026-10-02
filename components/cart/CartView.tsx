@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Check, Minus, Plus, Trash2, ArrowRight } from "lucide-react";
+import { Check, Minus, Plus, Trash2, ArrowRight, MapPin } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   toggleSelected,
@@ -27,18 +27,38 @@ function isAuthError(error: unknown): boolean {
   );
 }
 
+interface SavedAddress {
+  _id?: string;
+  label?: string;
+  fullName?: string;
+  phone?: string;
+  line1?: string;
+  line2?: string;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  isDefault?: boolean;
+}
+
 interface CartViewProps {
   showBack?: boolean;
   onBack?: () => void;
 }
+
+type CheckoutStep = "cart" | "select-address";
 
 export function CartView({ showBack = false, onBack }: CartViewProps) {
   const dispatch = useAppDispatch();
   const router = useRouter();
   const items = useAppSelector((s) => s.cart.items);
   const total = useAppSelector(selectCartTotal);
+  const [checkoutStep, setCheckoutStep] = useState<CheckoutStep>("cart");
+  const [addresses, setAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressIdx, setSelectedAddressIdx] = useState(0);
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
+  const [userName, setUserName] = useState("");
+  const [userEmail, setUserEmail] = useState("");
 
   useEffect(() => {
     if (items.length > 0) {
@@ -123,38 +143,48 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
       }
     }
 
-    setIsCheckingOut(true);
-    setCheckoutError("");
-
     try {
       const userResponse = (await api.auth.me()) as {
         user?: {
           name?: string;
           email?: string;
           phone?: string;
-          addresses?: Array<{
-            fullName?: string;
-            phone?: string;
-            line1?: string;
-            line2?: string;
-            city?: string;
-            state?: string;
-            pincode?: string;
-            isDefault?: boolean;
-          }>;
+          addresses?: SavedAddress[];
         };
       };
 
       const user = userResponse?.user;
-      const address = user?.addresses?.find((candidate) => candidate.isDefault) || user?.addresses?.[0];
+      setUserName(user?.name || "");
+      setUserEmail(user?.email || "");
 
-      const addressResult = addressSchema.safeParse(address);
-      if (!addressResult.success) {
+      const userAddresses = user?.addresses || [];
+      if (userAddresses.length === 0) {
         router.push("/profile?checkout=address-required");
         return;
       }
-      const validAddress = addressResult.data;
 
+      setAddresses(userAddresses);
+      const defaultIdx = userAddresses.findIndex((a) => a.isDefault);
+      setSelectedAddressIdx(defaultIdx >= 0 ? defaultIdx : 0);
+      setCheckoutStep("select-address");
+    } catch {
+      setCheckoutError("Failed to load your profile. Please try again.");
+    }
+  }
+
+  async function handleConfirmAddress() {
+    const address = addresses[selectedAddressIdx];
+    const addressResult = addressSchema.safeParse(address);
+    if (!addressResult.success) {
+      setCheckoutError("Selected address is incomplete. Please update it in your profile.");
+      return;
+    }
+    const validAddress = addressResult.data;
+
+    setIsCheckingOut(true);
+    setCheckoutError("");
+
+    try {
       const createdOrderResponse = (await api.orders.create({
         paymentMethod: "razorpay",
         shippingAddress: {
@@ -211,8 +241,8 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
         description: `Payment for order ${paymentPayload.orderId || orderId}`,
         order_id: paymentPayload.razorpayOrderId,
         prefill: {
-          name: user?.name || validAddress.fullName,
-          email: user?.email || "",
+          name: userName || validAddress.fullName,
+          email: userEmail || "",
           contact: validAddress.phone,
         },
         theme: {
@@ -241,6 +271,116 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
     } finally {
       setIsCheckingOut(false);
     }
+  }
+
+  if (checkoutStep === "select-address") {
+    return (
+      <div className="flex h-full flex-col bg-white">
+        <motion.header
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="flex items-center justify-between border-b border-border px-2 py-3 sm:px-4 lg:px-6"
+        >
+          <button
+            type="button"
+            onClick={() => { setCheckoutStep("cart"); setCheckoutError(""); }}
+            className="p-2 text-sm text-black"
+          >
+            ← Back
+          </button>
+          <h1 className="text-lg font-bold text-black">Delivery Address</h1>
+          <div className="w-10" />
+        </motion.header>
+
+        <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 lg:px-8">
+          <motion.ul
+            initial="hidden"
+            animate="visible"
+            variants={stagger}
+            className="grid gap-3"
+          >
+            {addresses.map((addr, idx) => (
+              <motion.li key={addr._id || idx} variants={fadeUp}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedAddressIdx(idx)}
+                  className={`w-full rounded-[14px] border p-4 text-left transition-colors ${
+                    selectedAddressIdx === idx
+                      ? "border-black bg-black/[0.03]"
+                      : "border-border bg-white"
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div
+                      className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors ${
+                        selectedAddressIdx === idx ? "border-black" : "border-border"
+                      }`}
+                    >
+                      {selectedAddressIdx === idx && (
+                        <div className="h-2.5 w-2.5 rounded-full bg-black" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2">
+                        <MapPin size={13} className="shrink-0 text-text-secondary" />
+                        <p className="text-[13px] font-semibold">
+                          {addr.label || "Address"}
+                          {addr.isDefault && (
+                            <span className="ml-2 text-[11px] font-normal text-text-secondary">Default</span>
+                          )}
+                        </p>
+                      </div>
+                      <p className="mt-1 text-[13px] leading-[1.5] text-text-secondary">
+                        {[addr.fullName, addr.line1, addr.line2, addr.city, addr.state, addr.pincode]
+                          .filter(Boolean)
+                          .join(", ")}
+                      </p>
+                      {addr.phone && (
+                        <p className="mt-1 text-xs text-text-secondary">{addr.phone}</p>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              </motion.li>
+            ))}
+          </motion.ul>
+
+          <motion.div initial="hidden" animate="visible" variants={fadeUp} className="mt-4">
+            <button
+              type="button"
+              onClick={() => router.push("/profile")}
+              className="text-sm font-medium text-black underline underline-offset-2"
+            >
+              + Add a new address
+            </button>
+          </motion.div>
+        </div>
+
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={viewport}
+          variants={fadeUp}
+          className="border-t border-transparent bg-white px-4 py-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:px-6 lg:px-8"
+        >
+          {checkoutError ? (
+            <p className="mb-3 text-sm text-red-600">{checkoutError}</p>
+          ) : null}
+          <button
+            type="button"
+            disabled={isCheckingOut}
+            onClick={handleConfirmAddress}
+            className={`flex w-full items-center justify-center gap-2 rounded-xl px-7 py-4 font-semibold text-white transition-colors ${
+              !isCheckingOut ? "bg-black" : "cursor-not-allowed bg-text-muted"
+            }`}
+          >
+            {isCheckingOut ? "Processing..." : "Pay now"}
+            {!isCheckingOut && <ArrowRight size={18} />}
+          </button>
+        </motion.div>
+      </div>
+    );
   }
 
   return (
