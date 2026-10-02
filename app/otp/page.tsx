@@ -9,10 +9,13 @@ import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import {
   fillNextOtpDigit,
   backspaceOtp,
+  setAuthenticated,
 } from "@/store/slices/authSlice";
 import { fadeUp, scaleIn, stagger } from "@/lib/motion";
 import { verifyPhoneOtp } from "@/lib/firebase-phone-auth";
 import { getOtpConfirmation, clearOtpConfirmation } from "@/lib/phone-otp-state";
+import { persistClientSession } from "@/lib/auth-token";
+import { resolvePostLoginPath } from "@/lib/auth-redirect";
 import { api } from "@/lib/api";
 import { otpSchema } from "@/lib/schemas";
 
@@ -24,10 +27,7 @@ function OtpContent() {
   const dispatch = useAppDispatch();
   const otpDigits = useAppSelector((s) => s.auth.otpDigits);
   const phoneNumber = searchParams.get("phone") ?? DEFAULT_PHONE;
-  const rawRedirect = searchParams.get("redirect") || "/home";
-  const redirectTo = rawRedirect.startsWith("/") && !rawRedirect.startsWith("/auth") && !rawRedirect.startsWith("/otp") && !rawRedirect.startsWith("/phone")
-    ? rawRedirect
-    : "/home";
+  const redirectTo = resolvePostLoginPath(searchParams.get("redirect"));
   const inputRef = useRef<HTMLInputElement>(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [error, setError] = useState("");
@@ -59,12 +59,19 @@ function OtpContent() {
       const { idToken } = await verifyPhoneOtp(otp, confirmation);
 
       // Create server session
-      await api.auth.firebasePhoneLogin(idToken);
+      const loginData = await api.auth.firebasePhoneLogin(idToken) as {
+        user: { id: string };
+        accessToken?: string;
+      };
 
-      // Clear stored confirmation
+      if (!loginData?.user?.id || !loginData.accessToken) {
+        throw new Error("Login did not return a session");
+      }
+
+      dispatch(setAuthenticated({ uid: loginData.user.id }));
+      await persistClientSession(loginData.accessToken);
+
       clearOtpConfirmation();
-
-      // Redirect to the requested page after login
       router.replace(redirectTo);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Verification failed";

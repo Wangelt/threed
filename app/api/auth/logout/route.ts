@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 export async function POST() {
   try {
     const cookieStore = await cookies();
+    cookieStore.delete("accessToken");
     cookieStore.delete("firebaseSession");
     return NextResponse.json({ success: true, message: "Logged out successfully" });
   } catch (error) {

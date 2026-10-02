@@ -1,3 +1,5 @@
+import { getAccessToken } from "@/lib/auth-token";
+
 const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
 
 export const API_CONFIG = {
@@ -34,11 +36,12 @@ async function request<T>(path: string, options: ApiRequestOptions = {}): Promis
   Object.entries(query || {}).forEach(([key, value]) => {
     if (value !== undefined && value !== null && value !== "") url.searchParams.set(key, String(value));
   });
+  const bearer = token || getAccessToken();
   const response = await fetch(url, {
     ...init, body, credentials: "include",
     headers: {
       ...(body && !(body instanceof FormData) ? { "Content-Type": "application/json" } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}), ...headers,
+      ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}), ...headers,
     },
   });
   const payload = (await response.json().catch(() => ({}))) as ApiResponse<T> & { details?: unknown };

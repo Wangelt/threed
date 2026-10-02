@@ -1,7 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { SiteHeader } from "@/components/layout/SiteHeader";
+import { useAppDispatch } from "@/store/hooks";
+import { setAuthenticated } from "@/store/slices/authSlice";
+import { api } from "@/lib/api";
 
 const HIDE_HEADER_PREFIXES = [
   "/auth",
@@ -12,6 +16,16 @@ const HIDE_HEADER_PREFIXES = [
 
 export function AppChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    api.auth.me()
+      .then((data) => {
+        const user = (data as { user: { id: string } })?.user;
+        if (user?.id) dispatch(setAuthenticated({ uid: user.id }));
+      })
+      .catch(() => {});
+  }, [dispatch]);
   const hideHeader = HIDE_HEADER_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );

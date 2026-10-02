@@ -15,6 +15,7 @@ import { PrimaryButton } from "@/components/ui/PrimaryButton";
 import { AppTextField } from "@/components/ui/AppTextField";
 import { fadeUp, heroStagger, stagger } from "@/lib/motion";
 import { api } from "@/lib/api";
+import { clearClientSession } from "@/lib/auth-token";
 
 interface ProfileAddress {
   _id?: string;
@@ -198,7 +199,16 @@ export function ProfileView() {
         variants={fadeUp}
         className="mt-6"
       >
-        <PrimaryButton label="Sign Out" onClick={() => api.auth.logout().then(() => router.replace("/auth"))} />
+        <PrimaryButton
+          label="Sign Out"
+          onClick={() =>
+            api.auth
+              .logout()
+              .catch(() => undefined)
+              .then(() => clearClientSession())
+              .then(() => router.replace("/auth"))
+          }
+        />
       </motion.div>
       </div>
     </div>

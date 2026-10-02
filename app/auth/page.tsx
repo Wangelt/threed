@@ -9,6 +9,7 @@ import {
   isValidPhoneNumber,
 } from "@/lib/firebase-phone-auth";
 import { phoneSchema } from "@/lib/schemas";
+import { resolvePostLoginPath } from "@/lib/auth-redirect";
 
 function LoginPageContent() {
   const [phoneInput, setPhoneInput] = useState("");
@@ -16,10 +17,7 @@ function LoginPageContent() {
   const [error, setError] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const rawRedirect = searchParams.get("redirect") || "/home";
-  const redirectTo = rawRedirect.startsWith("/") && !rawRedirect.startsWith("/auth") && !rawRedirect.startsWith("/otp") && !rawRedirect.startsWith("/phone")
-    ? rawRedirect
-    : "/home";
+  const redirectTo = resolvePostLoginPath(searchParams.get("redirect"));
 
   useEffect(() => clearRecaptcha, []);
 
