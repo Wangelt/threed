@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Store,
@@ -39,9 +39,12 @@ interface ProfileUser {
 
 export function ProfileView() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const checkoutParam = searchParams.get("checkout");
+  const needsAddress = checkoutParam === "address-required";
   const [user, setUser] = useState<ProfileUser | null>(null);
   const [wishlistCount, setWishlistCount] = useState(0);
-  const [showAddressForm, setShowAddressForm] = useState(false);
+  const [showAddressForm, setShowAddressForm] = useState(needsAddress);
   const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [addressError, setAddressError] = useState("");
   const [address, setAddress] = useState({
@@ -87,6 +90,17 @@ export function ProfileView() {
           {user?.email || user?.phone || "Sign in to view your account"}
         </motion.p>
       </motion.div>
+
+      {needsAddress && (
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeUp}
+          className="mt-6 rounded-[14px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+        >
+          Add a delivery address to continue checkout.
+        </motion.div>
+      )}
 
       <motion.div
         initial="hidden"
