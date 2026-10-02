@@ -7,13 +7,18 @@ const projectRoot = path.dirname(fileURLToPath(import.meta.url));
 const apiOrigin = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api")
   .replace(/\/api\/?$/, "");
 
+// Always include the production API host so the CSP works even when
+// NEXT_PUBLIC_API_URL is not set in the Vercel environment variables.
+const productionApiOrigin = "https://threednet.vercel.app";
+const connectSrcOrigins = [...new Set([apiOrigin, productionApiOrigin])].join(" ");
+
 const csp = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com https://www.gstatic.com https://www.google.com https://recaptcha.net https://apis.google.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://res.cloudinary.com https://images.unsplash.com https://www.gstatic.com",
   "font-src 'self' data:",
-  `connect-src 'self' ${apiOrigin} https://*.firebaseapp.com https://*.googleapis.com https://recaptcha.net https://api.razorpay.com https://lumberjack.razorpay.com`,
+  `connect-src 'self' ${connectSrcOrigins} https://*.firebaseapp.com https://*.googleapis.com https://recaptcha.net https://api.razorpay.com https://lumberjack.razorpay.com`,
   "frame-src https://checkout.razorpay.com https://*.firebaseapp.com https://accounts.google.com https://www.google.com https://recaptcha.net",
   "object-src 'none'",
   "base-uri 'self'",
