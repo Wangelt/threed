@@ -4,7 +4,6 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Search, ShoppingBag, User } from "lucide-react";
-import { AppLogo } from "@/components/ui/AppLogo";
 import { useAppSelector } from "@/store/hooks";
 import Image from "next/image";
 
@@ -37,10 +36,10 @@ export function SiteHeader() {
         <Link href="/home" className="flex shrink-0 items-center gap-2.5">
          <Image
            alt="App Logo"
-           src="/images/logo.png"  
+           src="/images/logo.png"
            width={500}
            height={500}
-           className="h-20 w-25 "
+           className="h-9 w-auto"
          />
         </Link>
 

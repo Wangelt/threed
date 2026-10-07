@@ -49,10 +49,17 @@ export function BottomSheet({ open, onClose, children, maxHeight = "85vh" }: Bot
   );
 }
 
-function SheetHandle() {
+function SheetHandle({ onClick }: { onClick?: () => void }) {
   return (
-    <div className="flex flex-col justify-center   pt-3"> 
-      <button className="h-10 w-10 flex justify-center items-center rounded-sm bg-border  ml-5 "  > &lsaquo; </button>
+    <div className="flex flex-col justify-center pt-3">
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClick}
+        className="h-10 w-10 flex justify-center items-center rounded-sm bg-border ml-5"
+      >
+        &lsaquo;
+      </button>
     </div>
   );
 }

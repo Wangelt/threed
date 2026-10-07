@@ -28,7 +28,7 @@ export const scaleInOnScroll: Variants = {
     opacity: 1,
     scale: 1,
     transition: {
-      duration: 8,
+      duration: 0.8,
       ease,
       delay: 0.05 + column * 0.1,
     },

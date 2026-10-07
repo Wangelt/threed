@@ -5,6 +5,7 @@ export interface CartItemModel {
   product: ProductModel;
   selected: boolean;
   quantity: number;
+  itemId?: string; // backend cart subdocument _id
 }
 
 interface CartState {
@@ -51,13 +52,16 @@ export const cartSlice = createSlice({
     replaceItems(state, action: PayloadAction<CartItemModel[]>) {
       state.items = action.payload;
     },
+    removeItem(state, action: PayloadAction<number>) {
+      state.items.splice(action.payload, 1);
+    },
     clearItems(state) {
       state.items = [];
     },
   },
 });
 
-export const { toggleSelected, incrementQuantity, decrementQuantity, addItem, replaceItems, clearItems } = cartSlice.actions;
+export const { toggleSelected, incrementQuantity, decrementQuantity, addItem, removeItem, replaceItems, clearItems } = cartSlice.actions;
 
 export function selectCartTotal(state: { cart: CartState }): number {
   return state.cart.items

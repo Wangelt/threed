@@ -1,5 +1,5 @@
 import type { OrderModel } from "@/lib/data/mock-orders";
-import { orderStatusLabel } from "@/lib/data/mock-orders";
+import { orderStatusLabel, OrderStatus } from "@/lib/data/mock-orders";
 import { StatusPill } from "./StatusPill";
 import { SafeImage } from "@/components/ui/SafeImage";
 
@@ -10,12 +10,21 @@ interface OrderCardProps {
   onSecondary?: () => void;
 }
 
+function statusVariant(status: OrderModel["status"]): "paid" | "shipped" | "delivered" | "returned" {
+  switch (status) {
+    case OrderStatus.Shipped: return "shipped";
+    case OrderStatus.Delivered: return "delivered";
+    case OrderStatus.Returned: return "returned";
+    default: return "paid";
+  }
+}
+
 export function OrderCard({ order, secondaryLabel, onDetails, onSecondary }: OrderCardProps) {
   return (
     <div className="rounded-[14px] border border-border p-3.5">
       <div className="flex items-center justify-between">
         <span className="text-[13px] font-semibold">{order.id}</span>
-        <StatusPill label={orderStatusLabel(order.status)} />
+        <StatusPill label={orderStatusLabel(order.status)} variant={statusVariant(order.status)} />
       </div>
 
       <div className="mt-3 space-y-2">
@@ -36,14 +45,14 @@ export function OrderCard({ order, secondaryLabel, onDetails, onSecondary }: Ord
         <button
           type="button"
           onClick={onDetails}
-          className="flex-1 rounded-[10px] border border-border py-2.5 text-[13px] text-black"
+          className="flex-1 rounded-[10px] border border-border py-2.5 text-[13px] text-black transition-colors hover:bg-surface"
         >
           Order Details
         </button>
         <button
           type="button"
           onClick={onSecondary}
-          className="flex-1 rounded-[10px] border border-border py-2.5 text-[13px] text-black"
+          className="flex-1 rounded-[10px] border border-border py-2.5 text-[13px] text-black transition-colors hover:bg-surface"
         >
           {secondaryLabel}
         </button>

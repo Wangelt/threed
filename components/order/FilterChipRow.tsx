@@ -6,7 +6,7 @@ interface FilterChipRowProps {
 
 export function FilterChipRow({ labels, selected, onSelected }: FilterChipRowProps) {
   return (
-    <div className="overflow-x-auto px-4">
+    <div className="overflow-x-auto">
       <div className="flex gap-2">
         {labels.map((label, i) => {
           const active = selected === i;

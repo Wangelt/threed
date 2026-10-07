@@ -173,19 +173,27 @@ function OtpContent() {
               onChange={handleChange}
               onKeyDown={handleKeyDown}
             />
-            {otpDigits.map((digit, index) => (
-              <motion.div
-                key={index}
-                variants={scaleIn}
-                className={`pointer-events-none flex h-14 min-w-0 flex-1 items-center justify-center text-2xl font-semibold sm:h-16 ${
-                  digit
-                    ? "border border-ink bg-white text-ink"
-                    : "border border-border bg-white text-ink"
-                }`}
-              >
-                {digit}
-              </motion.div>
-            ))}
+            {otpDigits.map((digit, index) => {
+              const activeIndex = otpDigits.findIndex((d) => !d);
+              const isActive = index === activeIndex;
+              return (
+                <motion.div
+                  key={index}
+                  variants={scaleIn}
+                  className={`pointer-events-none relative flex h-14 min-w-0 flex-1 items-center justify-center text-2xl font-semibold sm:h-16 ${
+                    isActive
+                      ? "border-2 border-ink bg-white text-ink"
+                      : digit
+                      ? "border border-ink bg-white text-ink"
+                      : "border border-border bg-white text-ink"
+                  }`}
+                >
+                  {digit || (isActive ? (
+                    <span className="animate-[blink_1s_step-end_infinite] border-r-2 border-ink h-7 w-0" />
+                  ) : null)}
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {error && (
@@ -199,7 +207,7 @@ function OtpContent() {
               type="button"
               onClick={handleVerifyOtp}
               disabled={isVerifying || otpDigits.some(d => !d)}
-              className="inline-flex items-center justify-center bg-black py-3 px-5 gap-2 text-sm font-semibold text-white *:disabled:opacity-50"
+              className="inline-flex items-center justify-center bg-black py-3 px-5 gap-2 text-sm font-semibold text-white disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isVerifying ? "Verifying..." : "Verify Code"}
             </button>

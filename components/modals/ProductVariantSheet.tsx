@@ -86,7 +86,7 @@ export function ProductVariantSheet({ product, open, onClose }: ProductVariantSh
 
   return (
     <BottomSheet open={open} onClose={onClose} maxHeight="75vh">
-      <BottomSheet.Handle />
+      <BottomSheet.Handle onClick={onClose} />
       <div className="overflow-y-auto px-5 pb-6">
         <div className="h-4" />
         <div className="flex gap-3.5">

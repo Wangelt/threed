@@ -35,21 +35,17 @@ export function LoginForm({ embedded = false }: LoginFormProps) {
       )}
 
       <motion.h2 variants={fadeUp} className="text-[22px] font-bold">
-        Hello again,
+        Welcome back
       </motion.h2>
-      <motion.div variants={fadeUp} className="flex items-center gap-2">
-        <span className="text-[22px] font-bold">Wangel</span>
-        <div className="w-7 h-7 rounded-full bg-surface" />
-      </motion.div>
       <motion.p variants={fadeUp} className="mt-1 text-[13px] text-text-secondary">
-        This are you.
+        Sign in to your account
       </motion.p>
 
       <motion.div variants={fadeUp} className="mt-6">
-        <label className="block text-[13px] font-medium mb-1.5">Username</label>
+        <label className="block text-[13px] font-medium mb-1.5">Email or Username</label>
         <div className="h-12 px-3.5 rounded-[10px] border border-border flex items-center justify-between">
-          <span className="text-sm">Johnappleseed</span>
-          <ChevronDown size={18} />
+          <input type="text" placeholder="Enter your email" className="flex-1 text-sm bg-transparent outline-none placeholder:text-text-muted" />
+          <ChevronDown size={18} className="shrink-0 text-text-muted" />
         </div>
       </motion.div>
 

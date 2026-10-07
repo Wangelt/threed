@@ -9,6 +9,7 @@ import {
   toggleSelected,
   incrementQuantity,
   decrementQuantity,
+  removeItem,
   selectCartTotal,
   replaceItems,
   clearItems,
@@ -59,6 +60,7 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
   const [checkoutError, setCheckoutError] = useState("");
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [removingIndex, setRemovingIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (items.length > 0) {
@@ -101,6 +103,7 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
           const variant = product?.variants?.[0];
           const image = product?.images?.[0] || "/images/p1.jpg";
           return {
+            itemId: item._id,
             selected: true,
             quantity: item.quantity || 1,
             product: {
@@ -130,6 +133,23 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
       isMounted = false;
     };
   }, [dispatch, items.length, router]);
+
+  async function handleRemoveItem(index: number) {
+    if (removingIndex !== null) return;
+    setRemovingIndex(index);
+    const item = items[index];
+    try {
+      if (item.itemId) {
+        await api.cart.remove(item.itemId);
+      }
+      dispatch(removeItem(index));
+    } catch {
+      // ignore — still remove locally so the UI doesn't get stuck
+      dispatch(removeItem(index));
+    } finally {
+      setRemovingIndex(null);
+    }
+  }
 
   async function handleCheckout() {
     if (total <= 0 || isCheckingOut) return;
@@ -174,29 +194,37 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
 
   async function handleConfirmAddress() {
     const address = addresses[selectedAddressIdx];
-    const addressResult = addressSchema.safeParse(address);
-    if (!addressResult.success) {
-      setCheckoutError("Selected address is incomplete. Please update it in your profile.");
-      return;
-    }
-    const validAddress = addressResult.data;
 
     setIsCheckingOut(true);
     setCheckoutError("");
 
     try {
-      const createdOrderResponse = (await api.orders.create({
-        paymentMethod: "razorpay",
-        shippingAddress: {
-          fullName: validAddress.fullName,
-          phone: validAddress.phone,
-          line1: validAddress.line1,
-          line2: validAddress.line2 ?? "",
-          city: validAddress.city,
-          state: validAddress.state,
-          pincode: validAddress.pincode,
-        },
-      })) as { order?: { _id?: string; orderId?: string } };
+      // Prefer addressId so the backend uses the exact stored address.
+      // Fall back to sending the full address when _id is unavailable.
+      const orderBody = address._id
+        ? { paymentMethod: "razorpay", addressId: address._id }
+        : (() => {
+            const normalized = {
+              ...address,
+              phone: (address.phone || "").replace(/\D/g, "").slice(-10),
+              pincode: (address.pincode || "").replace(/\D/g, "").slice(0, 6),
+            };
+            const result = addressSchema.safeParse(normalized);
+            if (!result.success) {
+              throw new Error(result.error.issues.map((i) => i.message).join(" · "));
+            }
+            const v = result.data;
+            return {
+              paymentMethod: "razorpay",
+              shippingAddress: {
+                fullName: v.fullName, phone: v.phone,
+                line1: v.line1, line2: v.line2 ?? "",
+                city: v.city, state: v.state, pincode: v.pincode,
+              },
+            };
+          })();
+
+      const createdOrderResponse = (await api.orders.create(orderBody)) as { order?: { _id?: string; orderId?: string } };
 
       const order = createdOrderResponse?.order;
       const orderId = order?._id || order?.orderId;
@@ -241,9 +269,9 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
         description: `Payment for order ${paymentPayload.orderId || orderId}`,
         order_id: paymentPayload.razorpayOrderId,
         prefill: {
-          name: userName || validAddress.fullName,
+          name: userName || address.fullName || "",
           email: userEmail || "",
-          contact: validAddress.phone,
+          contact: (address.phone || "").replace(/\D/g, "").slice(-10),
         },
         theme: {
           color: "#000000",
@@ -362,7 +390,7 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
           whileInView="visible"
           viewport={viewport}
           variants={fadeUp}
-          className="border-t border-transparent bg-white px-4 py-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:px-6 lg:px-8"
+          className="border-t border-border/60 bg-white px-4 py-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:px-6 lg:px-8"
         >
           {checkoutError ? (
             <p className="mb-3 text-sm text-red-600">{checkoutError}</p>
@@ -399,21 +427,26 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
           <div className="w-10" />
         )}
         <h1 className="text-lg font-bold text-black">My Cart</h1>
-        <button type="button" className="p-2" aria-label="Delete">
-          <Trash2 size={22} className="text-black" />
-        </button>
+        <div className="w-10" />
       </motion.header>
 
       <div className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 lg:px-8">
         {items.length === 0 ? (
-          <motion.p
+          <motion.div
             initial="hidden"
             animate="visible"
             variants={fadeUp}
-            className="py-12 text-center text-text-secondary"
+            className="flex flex-col items-center gap-4 py-16 text-center"
           >
-            Your cart is empty
-          </motion.p>
+            <p className="text-text-secondary">Your cart is empty</p>
+            <button
+              type="button"
+              onClick={() => router.push("/search/results?q=All+Products")}
+              className="rounded-xl bg-black px-6 py-3 text-sm font-semibold text-white"
+            >
+              Start Shopping
+            </button>
+          </motion.div>
         ) : (
           <motion.ul
             initial="hidden"
@@ -454,16 +487,27 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
                   <p className="mt-1 font-bold">{item.product.price}</p>
                 </div>
 
-                <div className="flex shrink-0 items-center gap-2">
-                  <QtyButton
-                    icon={Minus}
-                    onClick={() => dispatch(decrementQuantity(index))}
-                  />
-                  <span className="min-w-[20px] text-center text-sm">{item.quantity}</span>
-                  <QtyButton
-                    icon={Plus}
-                    onClick={() => dispatch(incrementQuantity(index))}
-                  />
+                <div className="flex shrink-0 flex-col items-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveItem(index)}
+                    disabled={removingIndex === index}
+                    className="flex h-[22px] w-[22px] items-center justify-center text-text-muted transition-colors hover:text-red-500 disabled:opacity-40"
+                    aria-label="Remove item"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                  <div className="flex items-center gap-2">
+                    <QtyButton
+                      icon={Minus}
+                      onClick={() => dispatch(decrementQuantity(index))}
+                    />
+                    <span className="min-w-[20px] text-center text-sm">{item.quantity}</span>
+                    <QtyButton
+                      icon={Plus}
+                      onClick={() => dispatch(incrementQuantity(index))}
+                    />
+                  </div>
                 </div>
               </motion.li>
             ))}
@@ -476,7 +520,7 @@ export function CartView({ showBack = false, onBack }: CartViewProps) {
         whileInView="visible"
         viewport={viewport}
         variants={fadeUp}
-        className="border-t border-transparent bg-white px-4 py-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:px-6 lg:px-8"
+        className="border-t border-border/60 bg-white px-4 py-4 shadow-[0_-4px_10px_rgba(0,0,0,0.05)] sm:px-6 lg:px-8"
       >
         <div className="flex w-full items-center gap-4">
           <div className="flex-1">

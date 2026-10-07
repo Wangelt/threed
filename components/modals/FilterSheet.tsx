@@ -27,7 +27,7 @@ export function FilterSheet({ open, onClose }: FilterSheetProps) {
 
   return (
     <BottomSheet open={open} onClose={onClose} maxHeight="95vh">
-      <BottomSheet.Handle />
+      <BottomSheet.Handle onClick={onClose} />
       <div className="flex items-center justify-between px-5 pt-4 pb-2">
         <h2 className="text-xl font-bold">Filter</h2>
         <button type="button" onClick={handleReset} className="text-sm text-black">
